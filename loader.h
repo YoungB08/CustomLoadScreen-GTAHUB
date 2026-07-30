@@ -25,6 +25,8 @@
 
 #include <string>
 
+void Log(const char* fmt, ...);
+
 const HANDLE INVALID_HANDLE = reinterpret_cast<HANDLE>(-1);
 const char PROJECT_NAME[]   = "CustomLoadScreen";
 const char PROJECT_NAME_l[] = "customloadscreen";

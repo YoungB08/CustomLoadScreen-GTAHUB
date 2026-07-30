@@ -12,11 +12,29 @@ static WNDPROC hOrigProc = NULL;
 static CustomLoadScreen *pCustomLoadScreen = static_cast<CustomLoadScreen*>(nullptr);
 static proxyIDirect3DDevice9* device = nullptr;
 
+#include <cstdio>
+#include <cstdarg>
+
+void Log(const char* fmt, ...)
+{
+    static FILE* f = fopen("CustomLoadScreen.log", "w");
+    if (!f) f = fopen("CustomLoadScreen.log", "a");
+    if (!f) return;
+
+    va_list args;
+    va_start(args, fmt);
+    vfprintf(f, fmt, args);
+    va_end(args);
+    fprintf(f, "\n");
+    fflush(f);
+}
+
 void __stdcall InstallD3DHook()
 {
     IDirect3DDevice9* realDev = *reinterpret_cast<IDirect3DDevice9 **>(0xC97C28);
     if (realDev != nullptr && realDev != static_cast<IDirect3DDevice9*>(device))
     {
+        Log("[HOOK] Installing D3D9 device proxy. realDev=%p", realDev);
         device = new proxyIDirect3DDevice9(realDev);
         *reinterpret_cast<IDirect3DDevice9 **>(0xC97C28) = static_cast<IDirect3DDevice9*>(device);
         g_class.d3d = *reinterpret_cast<IDirect3D9**>(0xC97C20);
@@ -25,11 +43,14 @@ void __stdcall InstallD3DHook()
         else
             g_class.DirectX->setDevice(device);
 
-        if (!pCustomLoadScreen)
+        if (!pCustomLoadScreen) {
+            Log("[HOOK] Creating CustomLoadScreen instance");
             pCustomLoadScreen = new CustomLoadScreen();
+        }
 
         if (pCustomLoadScreen && g_class.DirectX)
         {
+            Log("[HOOK] Setting Present callback");
             g_class.DirectX->SetPresentCallback(
                 [](const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride,
                        const RGNDATA *pDirtyRegion) {
@@ -93,21 +114,27 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReasonForCall, LPVOID)
     static CCallHook *gameloopHook = nullptr;
 
     if (dwReasonForCall == DLL_PROCESS_ATTACH){
+        Log("[INIT] CustomLoadScreen.asi attached to process");
 
         if (sizeof(CPed) != 1988){
+            Log("[ERROR] Incorrect CPed size");
             MessageBox("Incorrect CPed == " + std::to_string(sizeof(CPed)), PROJECT_NAME, MB_OK);
             return FALSE;
         }
         if (sizeof(CVehicle) != 2584){
+            Log("[ERROR] Incorrect CVehicle size");
             MessageBox("Incorrect CVehicle == " + std::to_string(sizeof(CVehicle)), PROJECT_NAME, MB_OK);
             return FALSE;
         }
 
+        Log("[INIT] Installing GameLoop hook at 0x00748DA3");
         gameloopHook = new CCallHook(reinterpret_cast<void*>(0x00748DA3),
                                      eSafeCall(sc_registers | sc_flags), 5);
         gameloopHook->enable(GameLoop);
+        Log("[INIT] GameLoop hook enabled successfully");
     }
     else if (dwReasonForCall == DLL_PROCESS_DETACH){
+        Log("[EXIT] Detaching CustomLoadScreen.asi");
         delete gameloopHook;
         gameloopHook = nullptr;
         SetWindowLongA(g_vars.hwnd, GWL_WNDPROC, reinterpret_cast<LONG>(hOrigProc));

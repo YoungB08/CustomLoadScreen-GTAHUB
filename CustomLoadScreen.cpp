@@ -36,6 +36,8 @@ bool CustomLoadScreen::Event(UINT uMsg, WPARAM wParam, LPARAM lParam)
     return true;
 }
 
+#include "loader.h"
+
 HRESULT CustomLoadScreen::Present(const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA *pDirtyRegion)
 {
     if ((g_vars.gameSatate >= 7 && GetModuleHandleA("samp.dll") == 0) || g_vars.gameSatate == 9)
@@ -50,11 +52,15 @@ HRESULT CustomLoadScreen::Present(const RECT *pSourceRect, const RECT *pDestRect
     if (screenHeight <= 0) screenHeight = 600;
 
     if (!init){
+        Log("[PRESENT] First frame Present. Creating Font and Texture (%dx%d)", screenWidth, screenHeight);
         pFont = g_class.DirectX->d3d9_CreateFont("Arial", 11, 5);
         pTexture = g_class.DirectX->d3d9_CreateTexture(screenWidth, screenHeight);
-        if (pTexture)
+        if (pTexture) {
+            Log("[PRESENT] Loading CustomLoadScreen.png texture");
             pTexture->Load("CustomLoadScreen.png");
+        }
         init = true;
+        Log("[PRESENT] Initialization complete");
     }
 
     if (!init || !pTexture || !pFont)
