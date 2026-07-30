@@ -44,14 +44,17 @@ proxyIDirect3DDevice9::~proxyIDirect3DDevice9 ( void )
 
 HRESULT proxyIDirect3DDevice9::QueryInterface ( REFIID riid, void **ppvObj )
 {
-    HRESULT hRes = g_class.DirectX->__d3d9_QueryInterface(riid, ppvObj);
+    if (ppvObj == NULL)
+        return E_POINTER;
 
-    *ppvObj = NULL;
-    hRes = origIDirect3DDevice9->QueryInterface( riid, ppvObj );
-    if ( hRes == NOERROR )
+    if (riid == __uuidof(IUnknown) || riid == __uuidof(IDirect3DDevice9))
+    {
         *ppvObj = this;
+        AddRef();
+        return S_OK;
+    }
 
-    return hRes;
+    return origIDirect3DDevice9->QueryInterface(riid, ppvObj);
 }
 
 ULONG proxyIDirect3DDevice9::AddRef ( void )
