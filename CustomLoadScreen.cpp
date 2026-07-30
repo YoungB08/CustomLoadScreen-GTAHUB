@@ -70,9 +70,14 @@ HRESULT CustomLoadScreen::Present(const RECT *pSourceRect, const RECT *pDestRect
     pTexture->Begin();
     pTexture->Clear(eCdBlack);
 
-    // Draw project name
-    pFont->PrintShadow(5, 5, -1, std::string(PROJECT_NAME) + " by SR_team");
-    pFont->PrintShadow(5, 20, -1, "Loading: " + std::to_string(static_cast<int>(11.111111 * g_vars.gameSatate)) + "%");
+    // Calculate progress percentage
+    int percentage = static_cast<int>(11.111111 * g_vars.gameSatate);
+    if (percentage > 100) percentage = 100;
+    if (percentage < 0) percentage = 0;
+
+    // Draw stylized text with HTML Hex color tags
+    pFont->PrintShadow(20, 20, -1, "{FF3333}GTAHUB {FFFFFF}| Roleplay Server");
+    pFont->PrintShadow(20, 42, -1, "{AAAAAA}Status: {FFFFFF}Loading game assets... {FFD700}" + std::to_string(percentage) + "%");
 
     pTexture->End();
     pTexture->Render(0, 0, screenWidth, screenHeight); // Draw texture
