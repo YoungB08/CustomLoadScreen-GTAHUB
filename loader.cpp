@@ -25,7 +25,10 @@ void __stdcall InstallD3DHook()
         else
             g_class.DirectX->setDevice(device);
 
-        if (pCustomLoadScreen)
+        if (!pCustomLoadScreen)
+            pCustomLoadScreen = new CustomLoadScreen();
+
+        if (pCustomLoadScreen && g_class.DirectX)
         {
             g_class.DirectX->SetPresentCallback(
                 [](const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride,
@@ -83,8 +86,7 @@ void __stdcall WindowInitialize() //007455DB
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReasonForCall, LPVOID)
 {
-    static CCallHook *gameloopHook;
-    static CCallHook *windowInitHook;
+    static CCallHook *gameloopHook = nullptr;
 
     if (dwReasonForCall == DLL_PROCESS_ATTACH){
 
@@ -97,18 +99,13 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReasonForCall, LPVOID)
             return FALSE;
         }
 
-
-        windowInitHook = new CCallHook(reinterpret_cast<void*>(0x007F67C1),
-                                       eSafeCall(sc_registers | sc_flags), 5);
-        windowInitHook->enable(WindowInitialize);
-
         gameloopHook = new CCallHook(reinterpret_cast<void*>(0x00748DA3),
                                      eSafeCall(sc_registers | sc_flags), 6);
         gameloopHook->enable(GameLoop);
     }
     else if (dwReasonForCall == DLL_PROCESS_DETACH){
-        delete windowInitHook;
         delete gameloopHook;
+        gameloopHook = nullptr;
         SetWindowLongA(g_vars.hwnd, GWL_WNDPROC, reinterpret_cast<LONG>(hOrigProc));
         delete pCustomLoadScreen;
         pCustomLoadScreen = nullptr;
