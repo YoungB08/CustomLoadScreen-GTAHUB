@@ -29,36 +29,61 @@ void Log(const char* fmt, ...)
     fflush(f);
 }
 
+typedef HRESULT (STDMETHODCALLTYPE *Present_t)(
+    IDirect3DDevice9* self,
+    const RECT* pSourceRect,
+    const RECT* pDestRect,
+    HWND hDestWindowOverride,
+    const RGNDATA* pDirtyRegion
+);
+
+static Present_t oPresent = nullptr;
+
+HRESULT STDMETHODCALLTYPE Hooked_Present(
+    IDirect3DDevice9* self,
+    const RECT* pSourceRect,
+    const RECT* pDestRect,
+    HWND hDestWindowOverride,
+    const RGNDATA* pDirtyRegion)
+{
+    if (g_class.DirectX)
+        g_class.DirectX->setDevice(self);
+
+    if (pCustomLoadScreen)
+        pCustomLoadScreen->Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
+
+    if (oPresent != nullptr)
+        return oPresent(self, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
+
+    return D3D_OK;
+}
+
 void __stdcall InstallD3DHook()
 {
     IDirect3DDevice9* realDev = *reinterpret_cast<IDirect3DDevice9 **>(0xC97C28);
-    if (realDev != nullptr && realDev != static_cast<IDirect3DDevice9*>(device))
+    if (realDev != nullptr && oPresent == nullptr)
     {
-        Log("[HOOK] Installing D3D9 device proxy. realDev=%p", realDev);
-        device = new proxyIDirect3DDevice9(realDev);
-        *reinterpret_cast<IDirect3DDevice9 **>(0xC97C28) = static_cast<IDirect3DDevice9*>(device);
+        Log("[HOOK] Hooking D3D9 Present via VTABLE swap. realDev=%p", realDev);
+        void** vtable = *reinterpret_cast<void***>(realDev);
+
+        DWORD oldProtect;
+        VirtualProtect(&vtable[17], sizeof(void*), PAGE_EXECUTE_READWRITE, &oldProtect);
+        oPresent = reinterpret_cast<Present_t>(vtable[17]);
+        vtable[17] = reinterpret_cast<void*>(Hooked_Present);
+        VirtualProtect(&vtable[17], sizeof(void*), oldProtect, &oldProtect);
+
         g_class.d3d = *reinterpret_cast<IDirect3D9**>(0xC97C20);
         if (!g_class.DirectX)
-            g_class.DirectX = new CDirectX(device);
+            g_class.DirectX = new CDirectX(realDev);
         else
-            g_class.DirectX->setDevice(device);
+            g_class.DirectX->setDevice(realDev);
 
         if (!pCustomLoadScreen) {
             Log("[HOOK] Creating CustomLoadScreen instance");
             pCustomLoadScreen = new CustomLoadScreen();
         }
 
-        if (pCustomLoadScreen && g_class.DirectX)
-        {
-            Log("[HOOK] Setting Present callback");
-            g_class.DirectX->SetPresentCallback(
-                [](const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride,
-                       const RGNDATA *pDirtyRegion) {
-                if (pCustomLoadScreen)
-                    return pCustomLoadScreen->Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
-                return D3D_OK;
-            });
-        }
+        Log("[HOOK] VTABLE Present hooked successfully!");
     }
 }
 
@@ -118,12 +143,19 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReasonForCall, LPVOID)
     }
     else if (dwReasonForCall == DLL_PROCESS_DETACH){
         Log("[EXIT] Detaching CustomLoadScreen.asi");
+        IDirect3DDevice9* realDev = *reinterpret_cast<IDirect3DDevice9 **>(0xC97C28);
+        if (realDev != nullptr && oPresent != nullptr)
+        {
+            void** vtable = *reinterpret_cast<void***>(realDev);
+            DWORD oldProtect;
+            VirtualProtect(&vtable[17], sizeof(void*), PAGE_EXECUTE_READWRITE, &oldProtect);
+            vtable[17] = reinterpret_cast<void*>(oPresent);
+            VirtualProtect(&vtable[17], sizeof(void*), oldProtect, &oldProtect);
+        }
         if (hOrigProc != NULL && g_vars.hwnd != NULL)
             SetWindowLongA(g_vars.hwnd, GWL_WNDPROC, reinterpret_cast<LONG>(hOrigProc));
         delete pCustomLoadScreen;
         pCustomLoadScreen = nullptr;
-        delete device;
-        device = nullptr;
         delete g_class.DirectX;
         g_class.DirectX = nullptr;
     }
