@@ -10,53 +10,65 @@ CDirectX::CDirectX(IDirect3DDevice9 *dx)
 
 IDirect3DDevice9 *CDirectX::d3d9_device()
 {
-    return dynamic_cast<proxyIDirect3DDevice9*>(_dx)->getOriginalDevice();
+    return _dx;
 }
 
 proxyIDirect3DDevice9 *CDirectX::d3d9_this()
 {
-    return dynamic_cast<proxyIDirect3DDevice9*>(_dx);
+    return nullptr;
 }
 
 HRESULT CDirectX::d3d9_GenerateShader(IDirect3DPixelShader9 **pShader, float alpha, float red, float green, float blue)
 {
-    return dynamic_cast<proxyIDirect3DDevice9*>(_dx)->GenerateShader(pShader, alpha, red, green, blue);
+    return D3D_OK;
 }
 
 CD3DFont *CDirectX::d3d9_CreateFont(const char *szFontName, int fontHeight, DWORD dwCreateFlags)
 {
     CD3DFont *pFont = new CD3DFont(szFontName, fontHeight, dwCreateFlags);
-    dynamic_cast<proxyIDirect3DDevice9*>(_dx)->RegisterFont(pFont);
+    if (pFont && _dx)
+        pFont->Initialize(_dx);
     return pFont;
 }
 
 CD3DRender *CDirectX::d3d9_CreateRender(int numVertices)
 {
     CD3DRender *pRender = new CD3DRender(numVertices);
-    dynamic_cast<proxyIDirect3DDevice9*>(_dx)->RegisterRender(pRender);
+    if (pRender && _dx)
+        pRender->Initialize(_dx);
     return pRender;
 }
 
 SRTexture *CDirectX::d3d9_CreateTexture(int width, int height)
 {
     SRTexture *pTexture = new SRTexture(width, height);
-    dynamic_cast<proxyIDirect3DDevice9*>(_dx)->RegisterTexture(pTexture);
+    if (pTexture && _dx)
+        pTexture->Initialize(_dx);
     return pTexture;
 }
 
 void CDirectX::d3d9_ReleaseFont(CD3DFont *pFont)
 {
-    dynamic_cast<proxyIDirect3DDevice9*>(_dx)->ReleaseFont(pFont);
+    if (pFont) {
+        pFont->Invalidate();
+        delete pFont;
+    }
 }
 
 void CDirectX::d3d9_ReleaseRender(CD3DRender *pRender)
 {
-    dynamic_cast<proxyIDirect3DDevice9*>(_dx)->ReleaseRender(pRender);
+    if (pRender) {
+        pRender->Invalidate();
+        delete pRender;
+    }
 }
 
 void CDirectX::d3d9_ReleaseTexture(SRTexture *pTexture)
 {
-    dynamic_cast<proxyIDirect3DDevice9*>(_dx)->ReleaseTexture(pTexture);
+    if (pTexture) {
+        pTexture->Release();
+        delete pTexture;
+    }
 }
 
 void CDirectX::SetPresentCallback(PresentCallback callback)

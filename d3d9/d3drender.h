@@ -125,6 +125,7 @@ protected:
 class CD3DFont : public CD3DBaseRender
 {
     friend class proxyIDirect3DDevice9;
+    friend class CDirectX;
 public:
     CD3DRender	*m_pRender;
 
@@ -171,6 +172,7 @@ class CD3DRender : public CD3DBaseRender
     friend class CD3DFont;
     friend class SRTexture;
     friend class proxyIDirect3DDevice9;
+    friend class CDirectX;
 public:
     CD3DRender ( int numVertices );
     ~		CD3DRender ();

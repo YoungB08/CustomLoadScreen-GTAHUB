@@ -7,6 +7,7 @@
 
 class SRTexture
 {
+    friend class CDirectX;
     enum eTextureSource{
         eTS_none,
         eTS_file,
