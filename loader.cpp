@@ -96,16 +96,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReasonForCall, LPVOID)
             MessageBox("Incorrect CVehicle == " + std::to_string(sizeof(CVehicle)), PROJECT_NAME, MB_OK);
             return FALSE;
         }
-        if (GetModuleHandleA((std::string(PROJECT_NAME) + ".asi").c_str()) != hModule){
-            char name[256];
-            GetModuleFileNameA(hModule, name, 256);
-            std::string filename = std::filesystem::path(name).filename().string();
-            MessageBox("Incorrect file name.\n"
-                       "Please rename " + filename +
-                       " to " + std::string(PROJECT_NAME) + ".asi",
-                       PROJECT_NAME, MB_OK);
-            return FALSE;
-        }
 
 
         windowInitHook = new CCallHook(reinterpret_cast<void*>(0x007F67C1),

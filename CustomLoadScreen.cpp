@@ -44,16 +44,20 @@ HRESULT CustomLoadScreen::Present(const RECT *pSourceRect, const RECT *pDestRect
     if (!g_class.DirectX || !g_class.DirectX->d3d9_device())
         return D3D_OK;
 
+    int screenWidth = *(int*)0x00C9C040;
+    int screenHeight = *(int*)0x00C9C044;
+    if (screenWidth <= 0) screenWidth = 800;
+    if (screenHeight <= 0) screenHeight = 600;
+
     if (!init){
-        init = true;
         pFont = g_class.DirectX->d3d9_CreateFont("Arial", 11, 5);
-        pTexture = g_class.DirectX->d3d9_CreateTexture(g_class.params->BackBufferWidth,
-                                                       g_class.params->BackBufferHeight);
-        pTexture->Load("CustomLoadScreen.png");
-        //pTexture->textureSizeAsBkg();
+        pTexture = g_class.DirectX->d3d9_CreateTexture(screenWidth, screenHeight);
+        if (pTexture)
+            pTexture->Load("CustomLoadScreen.png");
+        init = true;
     }
 
-    if (!init)
+    if (!init || !pTexture || !pFont)
         return D3D_OK;
 
     // Render
@@ -62,10 +66,10 @@ HRESULT CustomLoadScreen::Present(const RECT *pSourceRect, const RECT *pDestRect
 
     // Draw project name
     pFont->PrintShadow(5, 5, -1, std::string(PROJECT_NAME) + " by SR_team");
-    pFont->PrintShadow(5, 20, -1, "Loading: " + std::to_string(11.111111 * g_vars.gameSatate) + "%");
+    pFont->PrintShadow(5, 20, -1, "Loading: " + std::to_string(static_cast<int>(11.111111 * g_vars.gameSatate)) + "%");
 
     pTexture->End();
-    pTexture->Render(0, 0, g_class.params->BackBufferWidth, g_class.params->BackBufferHeight); // Draw texture
+    pTexture->Render(0, 0, screenWidth, screenHeight); // Draw texture
 
     return D3D_OK;
 }
