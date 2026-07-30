@@ -104,7 +104,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReasonForCall, LPVOID)
         }
 
         gameloopHook = new CCallHook(reinterpret_cast<void*>(0x00748DA3),
-                                     eSafeCall(sc_registers | sc_flags), 6);
+                                     eSafeCall(sc_registers | sc_flags), 5);
         gameloopHook->enable(GameLoop);
     }
     else if (dwReasonForCall == DLL_PROCESS_DETACH){
