@@ -182,12 +182,6 @@ HRESULT CD3DBaseRender::Initialize ( IDirect3DDevice9 *pD3Ddev )
     {
         pD3Ddev = *reinterpret_cast<IDirect3DDevice9 **>(0xC97C28);
     }
-    if (pD3Ddev != nullptr)
-    {
-        auto proxy = dynamic_cast<proxyIDirect3DDevice9*>(pD3Ddev);
-        if (proxy && proxy->getOriginalDevice() != nullptr)
-            pD3Ddev = proxy->getOriginalDevice();
-    }
 
     if ( m_pD3Ddev == NULL && (m_pD3Ddev = pD3Ddev) == NULL )
         return E_FAIL;

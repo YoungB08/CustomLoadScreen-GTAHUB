@@ -53,13 +53,6 @@ void SRTexture::Initialize(IDirect3DDevice9 *pDevice)
     if (this->pDevice == nullptr && g_class.DirectX)
         this->pDevice = g_class.DirectX->d3d9_device();
 
-    if (this->pDevice != nullptr)
-    {
-        auto proxy = dynamic_cast<proxyIDirect3DDevice9*>(this->pDevice);
-        if (proxy && proxy->getOriginalDevice() != nullptr)
-            this->pDevice = proxy->getOriginalDevice();
-    }
-
     if (!isReleased || this->pDevice == nullptr)
         return;
 
