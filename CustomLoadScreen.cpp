@@ -14,6 +14,124 @@ static bool cefChecked = false;
 static bool cefActive = false;
 static const int BROWSER_ID = 9988;
 
+static const char GTAHUB_EMBEDDED_HTML[] = R"html(<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GTAHUB Load Screen</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: transparent;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #ffffff;
+        }
+
+        .container {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 900px;
+            background: rgba(15, 15, 20, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 50, 50, 0.3);
+            border-radius: 12px;
+            padding: 24px 32px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 50, 50, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: #ff3333;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(255, 51, 51, 0.6);
+        }
+
+        .title span {
+            color: #ffffff;
+            font-weight: 400;
+            font-size: 18px;
+        }
+
+        .percentage {
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffd700;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #ff3333, #ff8800, #ffd700);
+            border-radius: 6px;
+            transition: width 0.3s ease-out;
+            box-shadow: 0 0 10px rgba(255, 51, 51, 0.8);
+        }
+
+        .footer-text {
+            font-size: 14px;
+            color: #aaaaaa;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">GTAHUB <span>| Roleplay Server</span></div>
+            <div class="percentage" id="percent-text">0%</div>
+        </div>
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progress-fill"></div>
+        </div>
+        <div class="footer-text" id="status-text">Loading game assets...</div>
+    </div>
+
+    <script>
+        function setProgress(percent) {
+            const clamped = Math.min(100, Math.max(0, percent));
+            document.getElementById('progress-fill').style.width = clamped + '%';
+            document.getElementById('percent-text').innerText = clamped + '%';
+            if (clamped >= 100) {
+                document.getElementById('status-text').innerText = 'Joining server...';
+            }
+        }
+    </script>
+</body>
+</html>)html";
+
 static void InitCEF()
 {
     if (cefChecked) return;
@@ -39,8 +157,18 @@ static void InitCEF()
 
         if (fn_cef_create_browser)
         {
-            Log("[CEF] Found CEF API in module %p. Loading gtahub.html...", hCEF);
-            fn_cef_create_browser(BROWSER_ID, "gtahub.html", true, false);
+            Log("[CEF] Found CEF API in module %p. Loading embedded HTML data URI...", hCEF);
+            std::string dataUrl = "data:text/html;charset=utf-8,";
+            for (char c : std::string(GTAHUB_EMBEDDED_HTML)) {
+                if (isalnum((unsigned char)c) || c == '-' || c == '_' || c == '.' || c == '~') {
+                    dataUrl += c;
+                } else {
+                    char buf[4];
+                    sprintf(buf, "%%%02X", (unsigned char)c);
+                    dataUrl += buf;
+                }
+            }
+            fn_cef_create_browser(BROWSER_ID, dataUrl.c_str(), false, false);
             cefActive = true;
         }
     }
