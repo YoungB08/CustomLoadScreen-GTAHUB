@@ -228,5 +228,5 @@ Các prefix quan trọng:
 ---
 
 ## 📄 License
-Remake from https://gitlab.com/prime-hack/samp/plugins/customloadscreen/
-© GTAHUB / SR_team. All rights reserved.
+> Remake from https://gitlab.com/prime-hack/samp/plugins/customloadscreen/
+> © GTAHUB / SR_team. All rights reserved.
