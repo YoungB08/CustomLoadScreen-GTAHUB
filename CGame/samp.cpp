@@ -20,7 +20,7 @@ template<typename T>
 T GetSAMPPtrInfo(uint32_t offset)
 {
     if (g_handle.samp == nullptr)
-        throw "g_handle.samp has null";
+        return nullptr;
     return *(T *)(g_handle.dwSAMP + offset);
 }
 

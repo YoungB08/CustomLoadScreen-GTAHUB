@@ -3,7 +3,7 @@
 CText::CText(const std::string& text, SRColor color, CNodeMenu* parent, POINT pos, CD3DFont *font, bool deleteOnDestructor ) : CNodeMenu( parent, pos, font, deleteOnDestructor )
 {
     if (parent == nullptr)
-        throw "Parent for CText can't be null";
+        return;
     _text = text;
     _color = color;
     _description = "";

@@ -3,7 +3,7 @@
 CSlider::CSlider(CNodeMenu* parent, POINT pos, uint length, float start, float end, float value, CD3DFont *text) : CNodeMenu(parent, pos, text)
 {
     if (parent == nullptr)
-        throw "Parent for CSlider can't be null";
+        return;
 
     _length = length;
     _start = start;

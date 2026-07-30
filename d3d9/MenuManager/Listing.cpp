@@ -3,7 +3,7 @@
 CListing::CListing( POINT pos, POINT size, CNodeMenu* parent ) : CNode( parent, pos, size )
 {
     if (parent == nullptr)
-        throw "Parent for CListing can't be null";
+        return;
     _height = size.y;
     _width = size.x + 6;
     _size = size;

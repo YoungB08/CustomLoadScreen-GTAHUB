@@ -3,7 +3,7 @@
 CVerticalLayout::CVerticalLayout( CNodeMenu* parent, POINT pos ) : CNode( parent, pos )
 {
     if (parent == nullptr)
-        throw "Parent for CVerticalLayout can't be null";
+        return;
     _height = 0;
     _width = 0;
 

@@ -4,7 +4,7 @@
 CNode::CNode( CNodeMenu* parent, POINT pos, POINT size ) : CNodeMenu( parent, pos )
 {
     if (parent == nullptr)
-        throw "Parent for CNode can't be null";
+        return;
     _size = size;
     _height = _size.y + 6;
     _width = _size.x + 6;
@@ -283,13 +283,13 @@ bool CNode::DelChield( const std::string& name )
 CNodeMenu* CNode::GetChield( const std::string& name )
 {
     if ( name.empty() )
-        throw "MenuManager error: name of chield can not be empty";
+        return nullptr;
 
-    for ( int i = 0; i < _nodes.size(); ++i )
+    for ( size_t i = 0; i < _nodes.size(); ++i )
         if ( _nodes[i].name == name )
             return _nodes[i].node;
 
-    throw std::string("MenuManager error: Chield \"") + name + "\" has not defined";
+    return nullptr;
 }
 
 bool CNode::isMouseInNode( int so_V, int so_H )

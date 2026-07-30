@@ -248,7 +248,7 @@ bool SRTexture::Render(const int X, const int Y, int W, int H, const float R)
 ID3DXSprite* SRTexture::GetSprite()
 {
     if (isReleased)
-        throw "Sprite is released";
+        return nullptr;
 
     return this->pSprite;
 }
@@ -257,7 +257,7 @@ ID3DXSprite* SRTexture::GetSprite()
 IDirect3DTexture9* SRTexture::GetTexture()
 {
     if (isReleased)
-        throw "Texture is released";
+        return nullptr;
 
     return this->pTexture;
 }

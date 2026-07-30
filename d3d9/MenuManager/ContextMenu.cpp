@@ -4,7 +4,7 @@
 CContextMenu::CContextMenu(CNodeMenu* parent, SRColor color ) : CNodeMenu( parent )
 {
     if (parent == nullptr)
-        throw "Parent for CContextMenu can't be null";
+        return;
     _color = color;
     _width = 0;
     _height = 0;
