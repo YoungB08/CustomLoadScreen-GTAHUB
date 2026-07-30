@@ -77,6 +77,7 @@
 //     }
 //
 #include "d3drender.h"
+#include "proxydirectx.h"
 #define M_PI       3.14159265358979323846
 
 IDirect3DDevice9 *CD3DBaseRender::		m_pD3Ddev = NULL;
@@ -177,6 +178,17 @@ CD3DBaseRender::~CD3DBaseRender ()
 
 HRESULT CD3DBaseRender::Initialize ( IDirect3DDevice9 *pD3Ddev )
 {
+    if (pD3Ddev == nullptr)
+    {
+        pD3Ddev = *reinterpret_cast<IDirect3DDevice9 **>(0xC97C28);
+    }
+    if (pD3Ddev != nullptr)
+    {
+        auto proxy = dynamic_cast<proxyIDirect3DDevice9*>(pD3Ddev);
+        if (proxy && proxy->getOriginalDevice() != nullptr)
+            pD3Ddev = proxy->getOriginalDevice();
+    }
+
     if ( m_pD3Ddev == NULL && (m_pD3Ddev = pD3Ddev) == NULL )
         return E_FAIL;
 

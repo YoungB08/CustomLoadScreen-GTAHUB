@@ -1151,6 +1151,12 @@ HRESULT proxyIDirect3DDevice9::GenerateShader ( IDirect3DPixelShader9 **pShader,
 
 IDirect3DDevice9 *proxyIDirect3DDevice9::getOriginalDevice()
 {
+    if (origIDirect3DDevice9 == nullptr)
+    {
+        IDirect3DDevice9 *pDev = *reinterpret_cast<IDirect3DDevice9 **>(0xC97C28);
+        if (pDev != nullptr && pDev != this)
+            origIDirect3DDevice9 = pDev;
+    }
     return origIDirect3DDevice9;
 }
 

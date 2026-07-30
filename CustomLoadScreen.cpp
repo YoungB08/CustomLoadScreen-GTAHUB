@@ -41,6 +41,9 @@ HRESULT CustomLoadScreen::Present(const RECT *pSourceRect, const RECT *pDestRect
     if ((g_vars.gameSatate >= 7 && GetModuleHandleA("samp.dll") == 0) || g_vars.gameSatate == 9)
         return D3D_OK;
 
+    if (!g_class.DirectX || !g_class.DirectX->d3d9_device())
+        return D3D_OK;
+
     if (!init){
         init = true;
         pFont = g_class.DirectX->d3d9_CreateFont("Arial", 11, 5);
