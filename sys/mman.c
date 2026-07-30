@@ -105,6 +105,13 @@ void* mmap(void *addr, size_t len, int prot, int flags, int fildes, off_t off)
         return MAP_FAILED;
     }
 
+    if ((flags & MAP_ANONYMOUS) != 0)
+    {
+        void *vmap = VirtualAlloc(addr, len, MEM_COMMIT | MEM_RESERVE, protect);
+        if (vmap != NULL)
+            return vmap;
+    }
+
     fm = CreateFileMapping(h, NULL, protect, dwMaxSizeHigh, dwMaxSizeLow, NULL);
 
     if (fm == NULL)
@@ -128,6 +135,9 @@ void* mmap(void *addr, size_t len, int prot, int flags, int fildes, off_t off)
 
 int munmap(void *addr, size_t len)
 {
+    if (VirtualFree(addr, 0, MEM_RELEASE))
+        return 0;
+
     if (UnmapViewOfFile(addr))
         return 0;
 

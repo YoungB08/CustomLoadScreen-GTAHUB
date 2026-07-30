@@ -55,6 +55,9 @@ if(MSVC)
     target_compile_options(CustomLoadScreen PRIVATE
         /EHsc
     )
+    target_link_options(CustomLoadScreen PRIVATE
+        /MAP:CustomLoadScreen.map /DEBUG
+    )
     set_property(TARGET CustomLoadScreen PROPERTY
         MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 else()

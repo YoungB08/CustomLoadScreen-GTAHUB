@@ -720,9 +720,14 @@ uint CShortAsm::getRelativeAddress(uint addr)
 
 void CShortAsm::write(byte v)
 {
+    if (!_code || _code == static_cast<byte*>(MAP_FAILED))
+        return;
     if (_offset + 1 >= _size)
-        resize(arrayToPages(_offset * 2));
-    _code[_offset++] = v;
-    if (_offset > _peak)
-        _peak = _offset;
+        resize(arrayToPages((_offset + 1) * 2));
+    if (_code && _code != static_cast<byte*>(MAP_FAILED))
+    {
+        _code[_offset++] = v;
+        if (_offset > _peak)
+            _peak = _offset;
+    }
 }
