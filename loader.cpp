@@ -63,7 +63,7 @@ void __stdcall InstallD3DHook()
     IDirect3DDevice9* realDev = *reinterpret_cast<IDirect3DDevice9 **>(0xC97C28);
     if (realDev != nullptr && oPresent == nullptr)
     {
-        Log("[HOOK] Hooking D3D9 Present via VTABLE swap. realDev=%p", realDev);
+        Log("[GTAHUB-HOOK] Hooking D3D9 Present via VTABLE swap. realDev=%p", realDev);
         void** vtable = *reinterpret_cast<void***>(realDev);
 
         DWORD oldProtect;
@@ -79,11 +79,11 @@ void __stdcall InstallD3DHook()
             g_class.DirectX->setDevice(realDev);
 
         if (!pCustomLoadScreen) {
-            Log("[HOOK] Creating CustomLoadScreen instance");
+            Log("[GTAHUB-HOOK] Creating CustomLoadScreen instance");
             pCustomLoadScreen = new CustomLoadScreen();
         }
 
-        Log("[HOOK] VTABLE Present hooked successfully!");
+        Log("[GTAHUB-HOOK] VTABLE Present hooked successfully!");
     }
 }
 
@@ -106,15 +106,15 @@ LRESULT APIENTRY WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 DWORD WINAPI D3DHookThread(LPVOID)
 {
-    Log("[THREAD] D3D Hook thread started, polling 0xC97C28...");
+    Log("[GTAHUB-THREAD] D3D Hook thread started, polling 0xC97C28...");
     for (int i = 0; i < 500; ++i)
     {
         IDirect3DDevice9* realDev = *reinterpret_cast<IDirect3DDevice9 **>(0xC97C28);
         if (realDev != nullptr && realDev != static_cast<IDirect3DDevice9*>(device))
         {
-            Log("[THREAD] Found valid D3D9 device at 0xC97C28: %p", realDev);
+            Log("[GTAHUB-THREAD] Found valid D3D9 device at 0xC97C28: %p", realDev);
             InstallD3DHook();
-            Log("[THREAD] D3D9 Hook installed successfully!");
+            Log("[GTAHUB-THREAD] D3D9 Hook installed successfully!");
             break;
         }
         Sleep(20);
@@ -125,24 +125,24 @@ DWORD WINAPI D3DHookThread(LPVOID)
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReasonForCall, LPVOID)
 {
     if (dwReasonForCall == DLL_PROCESS_ATTACH){
-        Log("[INIT] CustomLoadScreen.asi attached to process");
+        Log("[GTAHUB-INIT] CustomLoadScreen.asi attached to process");
 
         if (sizeof(CPed) != 1988){
-            Log("[ERROR] Incorrect CPed size");
+            Log("[GTAHUB-ERROR] Incorrect CPed size");
             MessageBox("Incorrect CPed == " + std::to_string(sizeof(CPed)), PROJECT_NAME, MB_OK);
             return FALSE;
         }
         if (sizeof(CVehicle) != 2584){
-            Log("[ERROR] Incorrect CVehicle size");
+            Log("[GTAHUB-ERROR] Incorrect CVehicle size");
             MessageBox("Incorrect CVehicle == " + std::to_string(sizeof(CVehicle)), PROJECT_NAME, MB_OK);
             return FALSE;
         }
 
-        Log("[INIT] Creating D3D9 hook thread");
+        Log("[GTAHUB-INIT] Creating D3D9 hook thread");
         CreateThread(NULL, 0, D3DHookThread, NULL, 0, NULL);
     }
     else if (dwReasonForCall == DLL_PROCESS_DETACH){
-        Log("[EXIT] Detaching CustomLoadScreen.asi");
+        Log("[GTAHUB-EXIT] Detaching CustomLoadScreen.asi");
         IDirect3DDevice9* realDev = *reinterpret_cast<IDirect3DDevice9 **>(0xC97C28);
         if (realDev != nullptr && oPresent != nullptr)
         {

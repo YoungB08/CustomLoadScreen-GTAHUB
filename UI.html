@@ -1,120 +1,197 @@
-html(
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GTAHUB Load Screen</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GTAHUB Loading</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Rajdhani',sans-serif;}
 
-        body {
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-            background: transparent;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #ffffff;
-        }
+body{overflow:hidden;background:url("images/bg.jpg") center/cover no-repeat fixed;}
 
-        .container {
-            position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            max-width: 900px;
-            background: rgba(15, 15, 20, 0.85);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 50, 50, 0.3);
-            border-radius: 12px;
-            padding: 24px 32px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 50, 50, 0.2);
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
+body::before{content:"";position:absolute;inset:0;
+background:linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.75)),
+radial-gradient(circle at top,#ff000015,transparent);
+backdrop-filter:blur(5px);}
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+.logo{position:absolute;top:10%;left:50%;transform:translateX(-50%);width:650px;
+filter:drop-shadow(0 0 25px #ff0000) drop-shadow(0 0 70px #ff000055);
+animation:logopulse 4s infinite alternate;}
 
-        .title {
-            font-size: 24px;
-            font-weight: 800;
-            letter-spacing: 1.5px;
-            color: #ff3333;
-            text-transform: uppercase;
-            text-shadow: 0 0 10px rgba(255, 51, 51, 0.6);
-        }
+@keyframes logopulse{
+from{transform:translateX(-50%) scale(1);}
+to{transform:translateX(-50%) scale(1.03);}
+}
 
-        .title span {
-            color: #ffffff;
-            font-weight: 400;
-            font-size: 18px;
-        }
+.panel{position:absolute;left:50%;bottom:45px;transform:translateX(-50%);
+width:1050px;padding:30px;border-radius:18px;
+background:rgba(15,15,18,.72);backdrop-filter:blur(18px);
+border:1px solid rgba(255,0,0,.25);
+box-shadow:0 0 45px rgba(255,0,0,.15),0 15px 60px rgba(0,0,0,.6);}
 
-        .percentage {
-            font-size: 20px;
-            font-weight: 700;
-            color: #ffd700;
-        }
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
 
-        .progress-bar-bg {
-            width: 100%;
-            height: 12px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 6px;
-            overflow: hidden;
-            position: relative;
-        }
+.title{font-size:42px;font-weight:700;color:#ff3c3c;letter-spacing:3px;}
+.title span{font-size:26px;font-weight:300;color:#fff;}
 
-        .progress-bar-fill {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, #ff3333, #ff8800, #ffd700);
-            border-radius: 6px;
-            transition: width 0.3s ease-out;
-            box-shadow: 0 0 10px rgba(255, 51, 51, 0.8);
-        }
+.percent{font-size:55px;font-weight:700;color:#ff4040;}
 
-        .footer-text {
-            font-size: 14px;
-            color: #aaaaaa;
-            text-align: right;
-        }
-    </style>
+.progress{height:18px;background:#101010;border-radius:20px;overflow:hidden;border:1px solid #333;}
+
+.fill{width:0%;height:100%;
+background:linear-gradient(90deg,#ff0000,#ff3d00,#ff7b00,#ff0000);
+background-size:400%;
+animation:shimmer 2s linear infinite;
+box-shadow:0 0 20px red;
+transition:width .25s ease-out;}
+
+@keyframes shimmer{0%{background-position:0%;}100%{background-position:400%;}}
+
+.status{margin-top:15px;font-size:22px;color:#999;letter-spacing:2px;}
+
+.info{margin-top:22px;display:flex;justify-content:space-between;color:#ddd;font-size:22px;}
+.left,.right{display:flex;gap:40px;}
+
+.item{display:flex;align-items:center;gap:8px;}
+.item svg{flex-shrink:0;opacity:.85;}
+
+.footer{margin-top:18px;display:flex;justify-content:space-between;font-size:18px;color:#666;}
+</style>
 </head>
-
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="title">GTAHUB <span>| Roleplay Server</span></div>
-            <div class="percentage" id="percent-text">0%</div>
-        </div>
-        <div class="progress-bar-bg">
-            <div class="progress-bar-fill" id="progress-fill"></div>
-        </div>
-        <div class="footer-text" id="status-text">Loading game assets...</div>
-    </div>
-    <script>
-        function setProgress(percent) {
-            const clamped = Math.min(100, Math.max(0, percent));
-            document.getElementById('progress-fill').style.width = clamped + '%';
-            document.getElementById('percent-text').innerText = clamped + '%';
-            if (clamped >= 100) {
-                document.getElementById('status-text').innerText = 'Joining server...';
-            }
-        }
-    </script>
-</body>
 
-</html>)html
+<img src="images/logo.png" class="logo">
+
+<div class="panel">
+  <div class="header">
+    <div class="title">GTAHUB <span>ROLEPLAY SERVER</span></div>
+    <div class="percent" id="percent">0%</div>
+  </div>
+
+  <div class="progress">
+    <div class="fill" id="fill"></div>
+  </div>
+
+  <div class="status" id="status">Connecting to server...</div>
+
+  <div class="info">
+    <div class="left">
+      <div class="item">
+        <!-- Globe -->
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff4040" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+        <span id="srv-host">play.gtahub.vn</span>
+      </div>
+      <div class="item">
+        <!-- Person -->
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff4040" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        <span id="srv-players">-- / --</span>
+      </div>
+      <div class="item">
+        <!-- Music -->
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff4040" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18V5l12-2v13"/>
+          <circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+        </svg>
+        <span id="srv-mode">Loading...</span>
+      </div>
+    </div>
+    <div class="right">
+      <div class="item">
+        <!-- Shield -->
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff4040" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        <span>Anti-Cheat</span>
+      </div>
+      <div class="item">
+        <!-- Box -->
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff4040" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+          <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
+        </svg>
+        <span>Assets</span>
+      </div>
+      <div class="item">
+        <!-- Clock -->
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff4040" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <span id="elapsed">00:00</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div>v2.5.1</div>
+    <div>www.gtahub.vn</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var startTime = Date.now();
+  var currentPct = 0;
+  var targetPct = 0;
+  var externalControl = false;
+  var animDuration = (3000 + Math.random() * 2000); // 3-5s
+  var animStart = null;
+
+  // Elapsed timer
+  setInterval(function(){
+    var s = Math.floor((Date.now() - startTime) / 1000);
+    var mm = String(Math.floor(s / 60)).padStart(2,'0');
+    var ss = String(s % 60).padStart(2,'0');
+    document.getElementById('elapsed').textContent = mm + ':' + ss;
+  }, 1000);
+
+  // Auto animation 0->100 in 3-5s
+  function autoAnimate(ts){
+    if(externalControl) return;
+    if(!animStart) animStart = ts;
+    var elapsed = ts - animStart;
+    var pct = Math.min(100, Math.round((elapsed / animDuration) * 100));
+    _applyProgress(pct);
+    if(pct < 100) requestAnimationFrame(autoAnimate);
+  }
+  requestAnimationFrame(autoAnimate);
+
+  function _applyProgress(val){
+    currentPct = val;
+    document.getElementById('fill').style.width = val + '%';
+    document.getElementById('percent').textContent = val + '%';
+    if(val >= 100){
+      document.getElementById('status').textContent = 'Joining server...';
+    }
+  }
+
+  // Called by C++ via CEF execute_js
+  window.setProgress = function(value){
+    externalControl = true;
+    _applyProgress(Math.max(0, Math.min(100, value)));
+  };
+
+  window.setSampInfo = function(players, maxPlayers, hostname, serverAddr){
+    // hostname = display name from stSAMP.szHostname
+    // serverAddr = IP from stSAMP.szIP (used as address label)
+    if(hostname && hostname.length > 0)
+      document.getElementById('srv-host').textContent = hostname;
+    if(serverAddr && serverAddr.length > 0)
+      document.getElementById('srv-mode').textContent = serverAddr;
+  };
+
+  window.setStatus = function(text){
+    document.getElementById('status').textContent = text;
+  };
+})();
+</script>
+</body>
+</html>

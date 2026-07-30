@@ -1,0 +1,14 @@
+﻿{
+  "serverName": "GTAHUB",
+  "serverSubtitle": "Roleplay Server",
+  "accentColor": "#ff3333",
+  "percentColor": "#ffd700",
+  "bgColor": "rgba(15, 15, 20, 0.85)",
+  "borderColor": "rgba(255, 50, 50, 0.3)",
+  "barGradient": ["#ff3333", "#ff8800", "#ffd700"],
+  "fontFamily": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+  "loadingText": "Loading game assets...",
+  "joinText": "Joining server...",
+  "logoUrl": "",
+  "backgroundUrl": ""
+}
