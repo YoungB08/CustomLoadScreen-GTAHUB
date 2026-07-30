@@ -1,0 +1,19 @@
+image: openscad/mxe-i686-deps
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+win32:
+  stage: build
+  before_script:
+    - export PATH="/mxe/usr/bin/:${PATH}"
+  script:
+    - cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/mxe/usr/i686-w64-mingw32.static.posix/share/cmake/mxe-conf.cmake
+    - cmake --build build --parallel `nproc --all`
+  artifacts:
+    paths:
+      - CustomLoadScreen.asi
+      - CustomLoadScreen.png
+  cache:
+    paths:
+      - "release/*.o"
+ 
