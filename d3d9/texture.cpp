@@ -34,12 +34,14 @@ void SRTexture::Release()
 {
     if (isRenderToTexture)
         End();
+    safe_release(PP1S);
     safe_release(pSprite);
     safe_release(pTexture);
 
     safe_release(pTexture_bkg);
     safe_release(DS);
-    render->Invalidate();
+    if (render)
+        render->Invalidate();
     isReleased = true;
 }
 
@@ -67,7 +69,6 @@ void SRTexture::Initialize(IDirect3DDevice9 *pDevice)
     if (SUCCEEDED(this->pDevice->CreateTexture(textureSize.x, textureSize.y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &pTexture, NULL)) && pTexture)
     {
         pTexture->GetSurfaceLevel(0, &PP1S);
-        if (PP1S) PP1S->Release();
     }
 
     this->pDevice->CreateDepthStencilSurface(textureSize.x, textureSize.y, D3DFMT_D24X8, D3DMULTISAMPLE_NONE, 0, FALSE, &DS, NULL);
@@ -83,24 +84,28 @@ void SRTexture::LoadTexture(const std::string& fileName)
 {
     std::wstring wFileName(fileName.begin(), fileName.end());
     D3DXIMAGE_INFO  imgInfo;
-    D3DXGetImageInfoFromFileW( wFileName.c_str(), &imgInfo );
-    textureSize_bkg.x = imgInfo.Width;
-    textureSize_bkg.y = imgInfo.Height;
-    D3DXCreateTextureFromFileW( pDevice, wFileName.c_str(), &pTexture_bkg );
+    if (SUCCEEDED(D3DXGetImageInfoFromFileW( wFileName.c_str(), &imgInfo )))
+    {
+        textureSize_bkg.x = imgInfo.Width;
+        textureSize_bkg.y = imgInfo.Height;
+        D3DXCreateTextureFromFileW( pDevice, wFileName.c_str(), &pTexture_bkg );
+    }
 }
 
 void SRTexture::LoadTexture(uint addr, uint size)
 {
     D3DXIMAGE_INFO  imgInfo;
-    D3DXGetImageInfoFromFileInMemory( (void*)addr, size, &imgInfo );
-    textureSize_bkg.x = imgInfo.Width;
-    textureSize_bkg.y = imgInfo.Height;
-    D3DXCreateTextureFromFileInMemory( pDevice, (void*)addr, size, &pTexture_bkg );
+    if (SUCCEEDED(D3DXGetImageInfoFromFileInMemory( (void*)addr, size, &imgInfo )))
+    {
+        textureSize_bkg.x = imgInfo.Width;
+        textureSize_bkg.y = imgInfo.Height;
+        D3DXCreateTextureFromFileInMemory( pDevice, (void*)addr, size, &pTexture_bkg );
+    }
 }
 
 bool SRTexture::Draw(IDirect3DTexture9 *texture, int X, int Y, int W, int H, float R)
 {
-    if (isReleased)
+    if (isReleased || texture == nullptr || pSprite == nullptr)
         return false;
 
     if (W == -1)
@@ -108,10 +113,11 @@ bool SRTexture::Draw(IDirect3DTexture9 *texture, int X, int Y, int W, int H, flo
     if (H == -1)
         H = textureSize.y;
 
-    D3DXMATRIX      mat;
     D3DSURFACE_DESC surfDesc;
-    texture->GetLevelDesc( 0, &surfDesc );
+    if (FAILED(texture->GetLevelDesc( 0, &surfDesc )))
+        return false;
 
+    D3DXMATRIX      mat;
     D3DXVECTOR2 axisPos = D3DXVECTOR2(X, Y);
     D3DXVECTOR2 size(1 / (float)surfDesc.Width * (float)W, 1 / (float)surfDesc.Height * (float)H);
     D3DXVECTOR2 axisCenter = D3DXVECTOR2((W / 2), (H / 2));
