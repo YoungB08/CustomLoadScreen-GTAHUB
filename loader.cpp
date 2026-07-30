@@ -24,6 +24,17 @@ void __stdcall InstallD3DHook()
             g_class.DirectX = new CDirectX(device);
         else
             g_class.DirectX->setDevice(device);
+
+        if (pCustomLoadScreen)
+        {
+            g_class.DirectX->SetPresentCallback(
+                [](const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride,
+                       const RGNDATA *pDirtyRegion) {
+                if (pCustomLoadScreen)
+                    return pCustomLoadScreen->Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
+                return D3D_OK;
+            });
+        }
     }
 }
 

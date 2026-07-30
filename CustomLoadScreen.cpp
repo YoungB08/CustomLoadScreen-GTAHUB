@@ -3,13 +3,13 @@
 CustomLoadScreen::CustomLoadScreen()
 {
     // Constructor
-
-    //Register present for draw on screen
-    g_class.DirectX->SetPresentCallback(
-                [this](const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride,
-                       const RGNDATA *pDirtyRegion) {
-        return Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
-    });
+    if (g_class.DirectX != nullptr) {
+        g_class.DirectX->SetPresentCallback(
+                    [this](const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride,
+                           const RGNDATA *pDirtyRegion) {
+            return Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
+        });
+    }
 }
 
 CustomLoadScreen::~CustomLoadScreen()

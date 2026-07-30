@@ -20,14 +20,13 @@ public:
 
     virtual void Loop();
     virtual bool Event(UINT uMsg, WPARAM wParam, LPARAM lParam);
+    HRESULT Present ( CONST RECT *pSourceRect, CONST RECT *pDestRect, HWND hDestWindowOverride,
+                      CONST RGNDATA *pDirtyRegion );
 
 private:
     CD3DFont *pFont = nullptr;
     SRTexture* pTexture = nullptr;
     bool init = false;
-
-    HRESULT Present ( CONST RECT *pSourceRect, CONST RECT *pDestRect, HWND hDestWindowOverride,
-                      CONST RGNDATA *pDirtyRegion );
 };
 
 #endif // CustomLoadScreen_H
