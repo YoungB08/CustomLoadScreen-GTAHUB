@@ -57,20 +57,17 @@ HRESULT proxyIDirect3DDevice9::QueryInterface ( REFIID riid, void **ppvObj )
 ULONG proxyIDirect3DDevice9::AddRef ( void )
 {
     g_class.DirectX->__d3d9_AddRef();
-    return origIDirect3DDevice9->AddRef();
+    if (origIDirect3DDevice9)
+        return origIDirect3DDevice9->AddRef();
+    return 1;
 }
 
 ULONG proxyIDirect3DDevice9::Release ( void )
 {
     g_class.DirectX->__d3d9_Release();
-    ULONG	count = origIDirect3DDevice9->Release();
-
-    if ( count == 0 )
-    {
-        delete( this );
-    }
-
-    return count;
+    if (origIDirect3DDevice9)
+        return origIDirect3DDevice9->Release();
+    return 0;
 }
 
 HRESULT proxyIDirect3DDevice9::TestCooperativeLevel ( void )

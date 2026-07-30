@@ -10,15 +10,15 @@ stGlobalPVars g_vars;
 
 static WNDPROC hOrigProc = NULL;
 static CustomLoadScreen *pCustomLoadScreen = static_cast<CustomLoadScreen*>(nullptr);
-static IDirect3DDevice9* device;
+static proxyIDirect3DDevice9* device = nullptr;
 
 void __stdcall InstallD3DHook()
 {
     IDirect3DDevice9* realDev = *reinterpret_cast<IDirect3DDevice9 **>(0xC97C28);
-    if (realDev != nullptr && realDev != dynamic_cast<IDirect3DDevice9*>(device))
+    if (realDev != nullptr && realDev != static_cast<IDirect3DDevice9*>(device))
     {
         device = new proxyIDirect3DDevice9(realDev);
-        *reinterpret_cast<IDirect3DDevice9 **>(0xC97C28) = dynamic_cast<IDirect3DDevice9*>(device);
+        *reinterpret_cast<IDirect3DDevice9 **>(0xC97C28) = static_cast<IDirect3DDevice9*>(device);
         g_class.d3d = *reinterpret_cast<IDirect3D9**>(0xC97C20);
         if (!g_class.DirectX)
             g_class.DirectX = new CDirectX(device);
@@ -112,8 +112,10 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReasonForCall, LPVOID)
         SetWindowLongA(g_vars.hwnd, GWL_WNDPROC, reinterpret_cast<LONG>(hOrigProc));
         delete pCustomLoadScreen;
         pCustomLoadScreen = nullptr;
-        delete dynamic_cast<proxyIDirect3DDevice9*>(device);
+        delete device;
+        device = nullptr;
         delete g_class.DirectX;
+        g_class.DirectX = nullptr;
     }
 
     return TRUE;
