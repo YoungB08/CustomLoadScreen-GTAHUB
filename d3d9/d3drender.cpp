@@ -533,7 +533,7 @@ stColorTag GetColorTag( const char *text, size_t maxLen )
     return color;
 }
 
-HRESULT CD3DFont::Print( QString text, SRColor color, float x, float y, bool skipColorTags, bool noColorFormat )
+HRESULT CD3DFont::Print( const std::string& text, SRColor color, float x, float y, bool skipColorTags, bool noColorFormat )
 {
     if ( !m_isReady || text.isEmpty() )
         return E_FAIL;
@@ -622,7 +622,7 @@ HRESULT CD3DFont::Print( QString text, SRColor color, float x, float y, bool ski
              return S_OK;
     }
 
-             HRESULT CD3DFont::PrintShadow (float x, float y, SRColor color, QString text )
+             HRESULT CD3DFont::PrintShadow (float x, float y, SRColor color, const std::string& text )
         {
              //if (set.render_text_shadows){
              if (color.red >= 0x80 && color.green >= 0x80 && color.blue >= 0x80)
@@ -632,7 +632,7 @@ HRESULT CD3DFont::Print( QString text, SRColor color, float x, float y, bool ski
              return Print(text.toStdString().c_str(), color, x, y, false, false);
     }
 
-             float CD3DFont::DrawLength ( QString text, bool noColorFormat ) const
+             float CD3DFont::DrawLength ( const std::string& text, bool noColorFormat ) const
         {
              float	len = 0.0f;
              float	sub = ( m_dwCreateFlags & FCR_BORDER ) ? 2.0f : 0.0f;
@@ -659,7 +659,7 @@ HRESULT CD3DFont::Print( QString text, SRColor color, float x, float y, bool ski
              return len;
     }
 
-             size_t CD3DFont::GetCharPos( QString text, float x, bool noColorFormat ) const
+             size_t CD3DFont::GetCharPos( const std::string& text, float x, bool noColorFormat ) const
         {
              size_t pos = 0;
              float	len = 0.0f;
@@ -998,3 +998,4 @@ HRESULT CD3DFont::Print( QString text, SRColor color, float x, float y, bool ski
 
              return true;
     }
+

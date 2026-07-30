@@ -1,7 +1,7 @@
 #include "ContextMenu.h"
 #include "Menu.h"
 
-CContextMenu::CContextMenu(QObject *parent, SRColor color ) : CNodeMenu( parent )
+CContextMenu::CContextMenu(CNodeMenu* parent, SRColor color ) : CNodeMenu( parent )
 {
     if (parent == nullptr)
         throw "Parent for CContextMenu can't be null";
@@ -50,7 +50,7 @@ bool CContextMenu::isInizialize()
     return true;
 }
 
-void CContextMenu::AddVariant(QString text, SRColor color )
+void CContextMenu::AddVariant(const std::string& text, SRColor color )
 {
     auto var = new CText( text, color, this );
     var->SetMenu( _menu );
@@ -63,7 +63,7 @@ void CContextMenu::AddVariant(QString text, SRColor color )
     }
 }
 
-void CContextMenu::SetDescription( QString desc )
+void CContextMenu::SetDescription( const std::string& desc )
 {
     _vars[_vars.size() - 1]->SetDescription( desc );
 }
@@ -95,12 +95,12 @@ bool CContextMenu::onEvents( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam 
         for ( int i = 0; i < _vars.size(); ++i ){
 
             if ( isMouseOnVariant(i) ){
-                emit eventContextMenu( this, i );
+                
                 return false;
             }
         }
         if ( isMouseOnWidget() )
-            emit eventContextMenu( this, -1 );
+            
         return false;
     }
 
@@ -126,3 +126,5 @@ void CContextMenu::SetPosition( POINT pos )
 
     return CNodeMenu::SetPosition( pos );
 }
+
+

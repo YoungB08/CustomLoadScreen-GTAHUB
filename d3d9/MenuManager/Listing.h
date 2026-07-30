@@ -2,14 +2,13 @@
 #define Listing_H
 
 #include "VerticalLayout.h"
-#include <QObject>
+#include <string>
 
 class CListing : public CNode
 {
-    Q_OBJECT
 
 public:
-    CListing( POINT, POINT, QObject *parent );
+    CListing( POINT, POINT, CNodeMenu* parent );
     ~CListing();
 
     virtual void onDraw( int = 0, int = 0 );
@@ -19,10 +18,10 @@ public:
 
     virtual void SetSize( POINT );
 
-    virtual bool AddChield( CNodeMenu*, QString = "" );
+    virtual bool AddChield( CNodeMenu*, const std::string& = "" );
     virtual bool DelChield( CNodeMenu* );
-    virtual bool DelChield( QString );
-    virtual CNodeMenu* GetChield( QString );
+    virtual bool DelChield( const std::string& );
+    virtual CNodeMenu* GetChield( const std::string& );
 
 protected:
     CVerticalLayout* _layout;

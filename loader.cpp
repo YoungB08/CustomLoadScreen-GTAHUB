@@ -1,7 +1,8 @@
 #include "loader.h"
 #include "CustomLoadScreen.h"
 #include "d3d9/proxydirectx.h"
-#include <QFileInfo>
+#include <filesystem>
+#include <string>
 
 stGlobalHandles g_handle;
 stGlobalClasses g_class;
@@ -75,19 +76,20 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReasonForCall, LPVOID)
     if (dwReasonForCall == DLL_PROCESS_ATTACH){
 
         if (sizeof(CPed) != 1988){
-            MessageBox("Incorrect CPed == " + QString::number(sizeof(CPed)), PROJECT_NAME, MB_OK);
+            MessageBox("Incorrect CPed == " + std::to_string(sizeof(CPed)), PROJECT_NAME, MB_OK);
             return FALSE;
         }
         if (sizeof(CVehicle) != 2584){
-            MessageBox("Incorrect CVehicle == " + QString::number(sizeof(CVehicle)), PROJECT_NAME, MB_OK);
+            MessageBox("Incorrect CVehicle == " + std::to_string(sizeof(CVehicle)), PROJECT_NAME, MB_OK);
             return FALSE;
         }
-        if (GetModuleHandleA((QString(PROJECT_NAME) + ".asi").toStdString().c_str()) != hModule){
+        if (GetModuleHandleA((std::string(PROJECT_NAME) + ".asi").c_str()) != hModule){
             char name[256];
             GetModuleFileNameA(hModule, name, 256);
+            std::string filename = std::filesystem::path(name).filename().string();
             MessageBox("Incorrect file name.\n"
-                       "Please rename " + QFileInfo(name).fileName() +
-                       " to " + QString(PROJECT_NAME) + ".asi",
+                       "Please rename " + filename +
+                       " to " + std::string(PROJECT_NAME) + ".asi",
                        PROJECT_NAME, MB_OK);
             return FALSE;
         }
@@ -114,7 +116,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReasonForCall, LPVOID)
     return TRUE;
 }
 
-int MessageBox(QString text, QString title, UINT type)
+int MessageBox(const std::string& text, const std::string& title, UINT type)
 {
-    return MessageBoxA(g_vars.hwnd, text.toStdString().c_str(), title.toStdString().c_str(), type);
+    return MessageBoxA(g_vars.hwnd, text.c_str(), title.c_str(), type);
 }

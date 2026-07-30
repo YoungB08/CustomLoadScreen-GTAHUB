@@ -1,10 +1,10 @@
 #include "proxydirectx.h"
-#include <QList>
+#include <vector>
 
 static IDirect3DDevice9* origIDirect3DDevice9 = static_cast<IDirect3DDevice9*>(nullptr);
-static QList<CD3DFont*> fontList;
-static QList<CD3DRender*> renderList;
-static QList<SRTexture*> textureList;
+static std::vector<CD3DFont*> fontList;
+static std::vector<CD3DRender*> renderList;
+static std::vector<SRTexture*> textureList;
 
 proxyIDirect3DDevice9::proxyIDirect3DDevice9 ( IDirect3DDevice9 *pOriginal )
 {

@@ -1,6 +1,6 @@
 #include "CSlider.h"
 
-CSlider::CSlider(QObject *parent, POINT pos, uint length, float start, float end, float value, CD3DFont *text) : CNodeMenu(parent, pos, text)
+CSlider::CSlider(CNodeMenu* parent, POINT pos, uint length, float start, float end, float value, CD3DFont *text) : CNodeMenu(parent, pos, text)
 {
     if (parent == nullptr)
         throw "Parent for CSlider can't be null";
@@ -42,7 +42,7 @@ bool CSlider::isInizialize()
 
     _texture = g_class.DirectX->d3d9_CreateTexture( _length, _length / 5.0f );
     _height = _font->DrawHeight();
-    _width = _length + _font->DrawLength(QString::number(_value));
+    _width = _length + _font->DrawLength(const std::string&::number(_value));
 
     _Init = true;
     return true;
@@ -75,14 +75,14 @@ void CSlider::onDraw( int so_V, int so_H )
                 _value = _start;
             if (_value > _end)
                 _value = _end;
-            emit eventValueChanged(this, _value);
-            emit eventValueEdited(this, _value);
+            
+            
         }
     }
 
     _texture->End();
     _texture->Render(posX, posY);
-    _font->PrintShadow(posX + _length, posY, _text, QString::number(_value));
+    _font->PrintShadow(posX + _length, posY, _text, const std::string&::number(_value));
 
     CNodeMenu::onDraw( so_V, so_H );
 }
@@ -99,8 +99,8 @@ bool CSlider::onEvents(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 void CSlider::setValue( float value )
 {
     _value = value;
-    _width = _length + _font->DrawLength(QString::number(_value));
-    emit eventValueChanged(this, value);
+    _width = _length + _font->DrawLength(const std::string&::number(_value));
+    
 }
 
 float CSlider::value()
@@ -138,3 +138,5 @@ bool CSlider::isMouseOnSlider( int so_V, int so_H )
         return true;
     return false;
 }
+
+

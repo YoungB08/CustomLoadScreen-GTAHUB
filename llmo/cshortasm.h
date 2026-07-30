@@ -1,8 +1,10 @@
 #ifndef CSHORTASM_H
 #define CSHORTASM_H
 
-#include <QString>
-#include <QMap>
+#include <string>
+#include <map>
+#include <cstdint>
+#include <vector>
 #include "sys/mman.h"
 
 typedef unsigned char byte;
@@ -31,7 +33,7 @@ public:
     ~CShortAsm();
 
     void insert(byte* array, uint size);
-    void insert(QByteArray array);
+    void insert(std::vector<uint8_t> array);
     void push(byte value);
     void push(int value);
     void push(r86 r);
@@ -40,14 +42,14 @@ public:
     void pop(r86 r);
     void popad();
     void popfd();
-    void label(QString label);
+    void label(const std::string& label);
     void jmp(int addr);
-    void jmp(QString label);
+    void jmp(const std::string& label);
     void jmp(r86 r);
     void ret(int pops = 0);
     void nop();
     void call(int addr);
-    void call(QString label);
+    void call(const std::string& label);
     void call(r86 r);
     void mov(int &var, r86 r); // mov var, EAX
     void mov(r86 r, int &var); // mov EAX, var
@@ -78,25 +80,25 @@ public:
     void XOR(r86 r, byte value);
     void XOR(r86 r, const int value);
     void je(const int addr);
-    void je(QString label);
+    void je(const std::string& label);
     void jne(const int addr);
-    void jne(QString label);
+    void jne(const std::string& label);
     void jl(const int addr);
-    void jl(QString label);
+    void jl(const std::string& label);
     void jle(const int addr);
-    void jle(QString label);
+    void jle(const std::string& label);
     void jg(const int addr);
-    void jg(QString label);
+    void jg(const std::string& label);
     void jge(const int addr);
-    void jge(QString label);
+    void jge(const std::string& label);
     void jb(const int addr);
-    void jb(QString label);
+    void jb(const std::string& label);
     void jbe(const int addr);
-    void jbe(QString label);
+    void jbe(const std::string& label);
     void ja(const int addr);
-    void ja(QString label);
+    void ja(const std::string& label);
     void jae(const int addr);
-    void jae(QString label);
+    void jae(const std::string& label);
 
     void resetWriteOffset();
     uint getWriteOffset();
@@ -119,7 +121,7 @@ protected:
 private:
     uint _offset = 0;
     uint _peak = 0;
-    QMap<QString, uint> _labels;
+    std::map<std::string, uint> _labels;
 };
 
 #endif // CSHORTASM_H

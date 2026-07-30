@@ -1,18 +1,17 @@
 #ifndef ContextMenu_H
 #define ContextMenu_H
 
-#include <QVector>
+#include <vector>
+#include <string>
 #include "NodeMenu.h"
 #include "Text.h"
 //#include "Menu.h"
-#include <QObject>
 
 class CContextMenu : public CNodeMenu
 {
-    Q_OBJECT
 
 public:
-    CContextMenu( QObject *parent, SRColor = 0xE8283848 );
+    CContextMenu( CNodeMenu* parent, SRColor = 0xE8283848 );
     virtual ~CContextMenu();
 
     virtual void onDraw( int = 0, int = 0 );
@@ -22,11 +21,11 @@ public:
 
     virtual void SetPosition( POINT );
 
-    virtual void AddVariant( QString, SRColor = -1 );
-    virtual void SetDescription( QString );
+    virtual void AddVariant( const std::string&, SRColor = -1 );
+    virtual void SetDescription( const std::string& );
 
 protected:
-    QVector<CText*> _vars;
+    std::vector<CText*> _vars;
 
     SRColor _color;
 
@@ -34,9 +33,6 @@ protected:
 
 private:
     bool _Init;
-
-signals:
-    void eventContextMenu(CContextMenu*, int);
 };
 
 #endif // ContextMenu_H

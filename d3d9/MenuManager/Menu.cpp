@@ -3,7 +3,7 @@
 
 std::vector<CMenu*> MenuList;
 
-CMenu::CMenu(QString title, POINT size, QObject *parent, CNode* node ) : CNodeMenu( parent )
+CMenu::CMenu(const std::string& title, POINT size, CNodeMenu* parent, CNode* node ) : CNodeMenu( parent )
 {
     _title = title;
     _size = size;
@@ -125,7 +125,7 @@ bool CMenu::onEvents( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 
     if ( _context != nullptr ){
         if ( !_context->onEvents( hwnd, uMsg, wParam, lParam ) ){
-            //            if ( _context->parent() == this )
+            //            if ( _context->_parent == this )
             //                delete _context;
             _context = nullptr;
         }
@@ -159,7 +159,7 @@ bool CMenu::onEvents( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
             _pos.x = _MP.x - _mvOffset.x;
             _pos.y = _MP.y - _mvOffset.y;
             _move = false;
-            emit eventMove( this, _pos );
+            
         }
         break;
     default:
@@ -191,19 +191,21 @@ CNode* CMenu::Node()
     return _node;
 }
 
-void CMenu::SetMenuHelper( QString help )
+void CMenu::SetMenuHelper( const std::string& help_in )
 {
-    if ( help.isEmpty() ){
+    if ( help_in.empty() ){
         p_helper.clear();
         return;
     }
-    while ( help.indexOf( "\n" ) != -1 ){
-        QRegExp re(R"(.*(\n(.*)))");
-        if (re.indexIn(help) >= 0)
-            p_helper.push_front( re.cap(2) );
-        help = help.remove(re.cap(1));
+    std::string help = help_in;
+    p_helper.clear();
+    size_t pos;
+    while ( (pos = help.find('\n')) != std::string::npos ){
+        std::string after = help.substr(pos + 1);
+        p_helper.insert(p_helper.begin(), after);
+        help = help.substr(0, pos);
     }
-    p_helper.push_front( help );
+    p_helper.insert(p_helper.begin(), help);
 }
 
 bool CMenu::isMouseOnHeader()
@@ -256,3 +258,5 @@ bool IsForeground( CMenu* menu )
         return true;
     return false;
 }
+
+

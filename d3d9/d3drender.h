@@ -132,11 +132,11 @@ public:
     ~			CD3DFont ();
 
 
-    HRESULT		Print(QString text, SRColor color, float x, float y, bool skipColorTags, bool noColorFormat );
-    HRESULT		PrintShadow( float x, float y, SRColor color, QString text );
+    HRESULT		Print(const std::string& text, SRColor color, float x, float y, bool skipColorTags, bool noColorFormat );
+    HRESULT		PrintShadow( float x, float y, SRColor color, const std::string& text );
 
-    float		DrawLength (QString text, bool noColorFormat = false ) const;
-    size_t		GetCharPos(QString text, float x, bool noColorFormat = false ) const;
+    float		DrawLength (const std::string& text, bool noColorFormat = false ) const;
+    size_t		GetCharPos(const std::string& text, float x, bool noColorFormat = false ) const;
 
     float DrawHeight () const
     {
@@ -208,3 +208,4 @@ private:
     bool					m_canRender;
 };
 #endif
+

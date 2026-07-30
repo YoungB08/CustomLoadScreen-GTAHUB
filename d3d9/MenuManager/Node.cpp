@@ -1,7 +1,7 @@
 #include "Node.h"
 #include "../proxydirectx.h"
 
-CNode::CNode( QObject *parent, POINT pos, POINT size ) : CNodeMenu( parent, pos )
+CNode::CNode( CNodeMenu* parent, POINT pos, POINT size ) : CNodeMenu( parent, pos )
 {
     if (parent == nullptr)
         throw "Parent for CNode can't be null";
@@ -24,7 +24,7 @@ CNode::CNode( QObject *parent, POINT pos, POINT size ) : CNodeMenu( parent, pos 
 CNode::~CNode()
 {
     for ( int i = 0; i < _nodes.size(); ++i )
-        if ( _nodes[i].node->parent() == this )
+        if ( _nodes[i].node->_parent == this )
             delete _nodes[i].node;
 
     g_class.DirectX->d3d9_ReleaseTexture(_texture);
@@ -239,7 +239,7 @@ void CNode::SetScrollColor(SRColor frame, SRColor mat, SRColor roller )
     _scrollRoller = roller;
 }
 
-bool CNode::AddChield( CNodeMenu* node, QString name )
+bool CNode::AddChield( CNodeMenu* node, const std::string& name )
 {
     if (name.length() > 1)
         for ( int i = 0; i < _nodes.size(); ++i )
@@ -255,7 +255,7 @@ bool CNode::DelChield( CNodeMenu* node )
 {
     for ( int i = 0; i < _nodes.size(); ++i ){
         if ( _nodes[i].node == node ){
-            if ( node->parent() == this )
+            if ( node->_parent == this )
                 delete node;
             _nodes.erase( _nodes.begin() + i );
             return true;
@@ -264,14 +264,14 @@ bool CNode::DelChield( CNodeMenu* node )
     return false;
 }
 
-bool CNode::DelChield( QString name )
+bool CNode::DelChield( const std::string& name )
 {
-    if ( name.isEmpty() )
+    if ( name.empty() )
         return false;
 
     for ( int i = 0; i < _nodes.size(); ++i ){
         if ( _nodes[i].name == name ){
-            if ( _nodes[i].node->parent() == this )
+            if ( _nodes[i].node->_parent == this )
                 delete _nodes[i].node;
             _nodes.erase( _nodes.begin() + i );
             return true;
@@ -280,16 +280,16 @@ bool CNode::DelChield( QString name )
     return false;
 }
 
-CNodeMenu* CNode::GetChield( QString name )
+CNodeMenu* CNode::GetChield( const std::string& name )
 {
-    if ( name.isEmpty() )
+    if ( name.empty() )
         throw "MenuManager error: name of chield can not be empty";
 
     for ( int i = 0; i < _nodes.size(); ++i )
         if ( _nodes[i].name == name )
             return _nodes[i].node;
 
-    throw "MenuManager error: Chield \"" + name + "\" has not defined";
+    throw std::string("MenuManager error: Chield \"") + name + "\" has not defined";
 }
 
 bool CNode::isMouseInNode( int so_V, int so_H )
@@ -311,3 +311,5 @@ void CNode::SetColorBkg(SRColor color )
 {
     _colorBkg = color;
 }
+
+

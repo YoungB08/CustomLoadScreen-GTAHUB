@@ -3,11 +3,10 @@
 
 #include "d3drender.h"
 #include "color.h"
-#include <QString>
+#include <string>
 
-class SRTexture : public QObject
+class SRTexture
 {
-    Q_OBJECT
     enum eTextureSource{
         eTS_none,
         eTS_file,
@@ -16,7 +15,7 @@ class SRTexture : public QObject
 
     friend class proxyIDirect3DDevice9;
 public:
-    SRTexture(int width, int height, QObject *parent = nullptr);
+    SRTexture(int width, int height);
     virtual ~SRTexture();
 
     virtual void Begin();
@@ -24,9 +23,9 @@ public:
 
     virtual bool Clear( SRColor color = 0 );
     virtual bool Render( int X, int Y, int W = -1, int H = -1, float R = 0.0f );
-    virtual HRESULT Save( QString fileName );
+    virtual HRESULT Save( const std::string& fileName );
     // TODO: save to mem
-    virtual HRESULT Load( QString fileName );
+    virtual HRESULT Load( const std::string& fileName );
     virtual HRESULT Load( uint addr, uint size );
     virtual bool textureSizeAsBkg();
 
@@ -38,36 +37,32 @@ public:
 protected:
     void Release();
     void Initialize( IDirect3DDevice9 *pDevice = nullptr );
-    virtual void LoadTexture( QString fileName );
+    virtual void LoadTexture( const std::string& fileName );
     virtual void LoadTexture( uint addr, uint size );
     virtual bool Draw(IDirect3DTexture9 *texture, int X, int Y, int W = -1, int H = -1, float R = 0.0f );
 
-    ID3DXSprite*			pSprite;
-    IDirect3DTexture9*		pTexture;
-    POINT					textureSize;
-    IDirect3DDevice9*		pDevice;
+    ID3DXSprite*            pSprite;
+    IDirect3DTexture9*      pTexture;
+    POINT                   textureSize;
+    IDirect3DDevice9*       pDevice;
 
-    IDirect3DTexture9*		pTexture_bkg = nullptr;
-    POINT					textureSize_bkg;
+    IDirect3DTexture9*      pTexture_bkg = nullptr;
+    POINT                   textureSize_bkg;
     eTextureSource          source_bkg;
-    QString                 path_bkg;
+    std::string             path_bkg;
     uint                    addr_bkg;
     uint                    size_bkg;
 
-    bool					isRenderToTexture;
-    bool					isReleased;
+    bool                    isRenderToTexture;
+    bool                    isReleased;
     bool                    kIsCalledFirstInitialize;
 
 private:
     LPDIRECT3DSURFACE9      PP1S = NULL;
     LPDIRECT3DSURFACE9      DS = NULL;
-    LPDIRECT3DSURFACE9		OldRT, OldDS;
+    LPDIRECT3DSURFACE9      OldRT, OldDS;
 
     CD3DRender              *render;
-
-signals:
-    void eventInitialized();
-    void eventReleased();
 };
 
 #endif // CCREATETEXTURE_H

@@ -8,7 +8,7 @@ if(NOT CMAKE_SIZEOF_VOID_P EQUAL 4)
     message(FATAL_ERROR "CustomLoadScreen must be built with a 32-bit toolchain.")
 endif()
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -54,14 +54,10 @@ target_compile_definitions(CustomLoadScreen PRIVATE
 if(MSVC)
     target_compile_options(CustomLoadScreen PRIVATE
         /EHsc
-        "$<$<COMPILE_LANGUAGE:CXX>:/FI${CMAKE_CURRENT_SOURCE_DIR}/compat/qt_compat.h>"
     )
     set_property(TARGET CustomLoadScreen PROPERTY
         MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 else()
-    target_compile_options(CustomLoadScreen PRIVATE
-        "$<$<COMPILE_LANGUAGE:CXX>:-include;${CMAKE_CURRENT_SOURCE_DIR}/compat/qt_compat.h>"
-    )
     target_link_options(CustomLoadScreen PRIVATE
         -static
         -static-libgcc

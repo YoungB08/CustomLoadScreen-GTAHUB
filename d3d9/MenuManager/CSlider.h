@@ -3,13 +3,11 @@
 
 #include "Text.h"
 #include "../texture.h"
-#include <QObject>
 
 class CSlider : public CNodeMenu
 {
-    Q_OBJECT
 public:
-    CSlider(QObject *parent, POINT pos, uint length, float start = 1.0f, float end = 99.0f, float value = 1.0f, CD3DFont* = nullptr);
+    CSlider(CNodeMenu* parent, POINT pos, uint length, float start = 1.0f, float end = 99.0f, float value = 1.0f, CD3DFont* = nullptr);
 
     virtual ~CSlider();
 
@@ -40,10 +38,6 @@ protected:
 
 private:
     bool _init;
-
-signals:
-    void eventValueChanged(CSlider*, float);
-    void eventValueEdited(CSlider*, float);
 };
 
 #endif // CSLIDER_H

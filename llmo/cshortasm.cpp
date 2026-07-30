@@ -18,7 +18,7 @@ void CShortAsm::insert(byte* array, uint size)
         write(array[i]);
 }
 
-void CShortAsm::insert(QByteArray array)
+void CShortAsm::insert(std::vector<uint8_t> array)
 {
     insert(reinterpret_cast<byte*>(array.data()), static_cast<uint>(array.size()));
 }
@@ -70,7 +70,7 @@ void CShortAsm::popfd()
     write(0x9D);
 }
 
-void CShortAsm::label(QString label)
+void CShortAsm::label(const std::string& label)
 {
     _labels[label] = reinterpret_cast<uint>(_code) + _offset;
 }
@@ -86,7 +86,7 @@ void CShortAsm::jmp(int addr)
     write(v.bytes[3]);
 }
 
-void CShortAsm::jmp(QString label)
+void CShortAsm::jmp(const std::string& label)
 {
     jmp(static_cast<int>(_labels[label]));
 }
@@ -126,7 +126,7 @@ void CShortAsm::call(int addr)
     write(v.bytes[3]);
 }
 
-void CShortAsm::call(QString label)
+void CShortAsm::call(const std::string& label)
 {
     call(static_cast<int>(_labels[label]));
 }
@@ -494,7 +494,7 @@ void CShortAsm::je(const int addr)
     write(v.bytes[3]);
 }
 
-void CShortAsm::je(QString label)
+void CShortAsm::je(const std::string& label)
 {
     je(static_cast<int>(_labels[label]));
 }
@@ -512,7 +512,7 @@ void CShortAsm::jne(const int addr)
     write(v.bytes[3]);
 }
 
-void CShortAsm::jne(QString label)
+void CShortAsm::jne(const std::string& label)
 {
     jne(static_cast<int>(_labels[label]));
 }
@@ -530,7 +530,7 @@ void CShortAsm::jl(const int addr)
     write(v.bytes[3]);
 }
 
-void CShortAsm::jl(QString label)
+void CShortAsm::jl(const std::string& label)
 {
     jl(static_cast<int>(_labels[label]));
 }
@@ -548,7 +548,7 @@ void CShortAsm::jle(const int addr)
     write(v.bytes[3]);
 }
 
-void CShortAsm::jle(QString label)
+void CShortAsm::jle(const std::string& label)
 {
     jle(static_cast<int>(_labels[label]));
 }
@@ -566,7 +566,7 @@ void CShortAsm::jg(const int addr)
     write(v.bytes[3]);
 }
 
-void CShortAsm::jg(QString label)
+void CShortAsm::jg(const std::string& label)
 {
     jg(static_cast<int>(_labels[label]));
 }
@@ -584,7 +584,7 @@ void CShortAsm::jge(const int addr)
     write(v.bytes[3]);
 }
 
-void CShortAsm::jge(QString label)
+void CShortAsm::jge(const std::string& label)
 {
     jge(static_cast<int>(_labels[label]));
 }
@@ -602,7 +602,7 @@ void CShortAsm::jb(const int addr)
     write(v.bytes[3]);
 }
 
-void CShortAsm::jb(QString label)
+void CShortAsm::jb(const std::string& label)
 {
     jb(static_cast<int>(_labels[label]));
 }
@@ -620,7 +620,7 @@ void CShortAsm::jbe(const int addr)
     write(v.bytes[3]);
 }
 
-void CShortAsm::jbe(QString label)
+void CShortAsm::jbe(const std::string& label)
 {
     jbe(static_cast<int>(_labels[label]));
 }
@@ -638,7 +638,7 @@ void CShortAsm::ja(const int addr)
     write(v.bytes[3]);
 }
 
-void CShortAsm::ja(QString label)
+void CShortAsm::ja(const std::string& label)
 {
     ja(static_cast<int>(_labels[label]));
 }
@@ -656,7 +656,7 @@ void CShortAsm::jae(const int addr)
     write(v.bytes[3]);
 }
 
-void CShortAsm::jae(QString label)
+void CShortAsm::jae(const std::string& label)
 {
     jae(static_cast<int>(_labels[label]));
 }

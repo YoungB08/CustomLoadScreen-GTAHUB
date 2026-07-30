@@ -2,8 +2,9 @@
 #include "Menu.h"
 #include "../proxydirectx.h"
 
-CNodeMenu::CNodeMenu(QObject *parent, POINT pos, CD3DFont *font, bool deleteOnDestructor ) : QObject( parent )
+CNodeMenu::CNodeMenu(CNodeMenu* parent, POINT pos, CD3DFont *font, bool deleteOnDestructor )
 {
+    _parent = parent;
     _pos = pos;
     _show = true;
     _menu = nullptr;
@@ -30,6 +31,7 @@ CNodeMenu::~CNodeMenu()
         g_class.DirectX->d3d9_ReleaseFont( _font );
     g_class.DirectX->d3d9_ReleaseRender( _draw );
 }
+
 void CNodeMenu::onDraw( int so_V, int so_H )
 {
     if ( !isInizialize() )
@@ -45,7 +47,7 @@ void CNodeMenu::onDraw( int so_V, int so_H )
             if ( _menu != this && _selectable )
                 _draw->D3DBoxBorder( _pos.x - so_H - 1, _pos.y - so_V - 1, _width + 2, _height + 2, _colorSelect, 0 );
 
-            if ( !_description.isEmpty() )
+            if ( !_description.empty() )
                 ((CMenu*)_menu)->SetMenuHelper( _description );
         }
     }
@@ -62,7 +64,6 @@ bool CNodeMenu::onEvents( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
     case WM_LBUTTONUP:
     case WM_RBUTTONDOWN:
     case WM_RBUTTONUP:
-        emit eventClick( this, uMsg );
         return false;
     default:
         break;
@@ -86,7 +87,6 @@ bool CNodeMenu::isInizialize()
 void CNodeMenu::SetPosition( POINT pos )
 {
     _pos = pos;
-    emit eventMove( this, _pos );
 }
 
 POINT CNodeMenu::Position()
@@ -102,7 +102,6 @@ bool CNodeMenu::isShowed()
 void CNodeMenu::SetShow( bool show )
 {
     _show = show;
-    emit eventShow(this, show);
 }
 
 bool CNodeMenu::isSelectable()
@@ -148,12 +147,12 @@ bool CNodeMenu::isMouseOnWidget( int so_V, int so_H )
     return false;
 }
 
-void CNodeMenu::SetDescription( QString description )
+void CNodeMenu::SetDescription( const std::string& description )
 {
     _description = description;
 }
 
-QString CNodeMenu::Description()
+std::string CNodeMenu::Description()
 {
     return _description;
 }
@@ -162,3 +161,5 @@ void CNodeMenu::SetMenu( CNodeMenu *menu )
 {
     _menu = menu;
 }
+
+

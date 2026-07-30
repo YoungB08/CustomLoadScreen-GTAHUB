@@ -3,20 +3,19 @@
 
 #include "NodeMenu.h"
 #include "../texture.h"
-#include <QVector>
-#include <QObject>
+#include <vector>
+#include <string>
 
 struct stNodeChield{
-    CNodeMenu*	node;
-    QString name;
+    CNodeMenu*  node;
+    std::string name;
 };
 
 class CNode : public CNodeMenu
 {
-    Q_OBJECT
 
 public:
-    CNode( QObject *parent, POINT = { 0, 0 }, POINT = { 100, 100 } );
+    CNode( CNodeMenu* parent, POINT = { 0, 0 }, POINT = { 100, 100 } );
     virtual ~CNode();
 
     virtual void onDraw( int = 0, int = 0 );
@@ -36,17 +35,17 @@ public:
     virtual void ScrollColor( SRColor&, SRColor&, SRColor& );
     virtual void SetScrollColor( SRColor, SRColor, SRColor );
 
-    virtual bool AddChield( CNodeMenu*, QString = "" );
+    virtual bool AddChield( CNodeMenu*, const std::string& = "" );
     virtual bool DelChield( CNodeMenu* );
-    virtual bool DelChield( QString );
-    virtual CNodeMenu* GetChield( QString );
+    virtual bool DelChield( const std::string& );
+    virtual CNodeMenu* GetChield( const std::string& );
 
     virtual SRColor ColorBkg();
     virtual void SetColorBkg( SRColor );
 
 protected:
     SRTexture *_texture;
-    QVector<stNodeChield> _nodes;
+    std::vector<stNodeChield> _nodes;
 
     POINT _size;
     int _scrollOffsetVertical;

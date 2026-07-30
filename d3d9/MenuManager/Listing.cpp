@@ -1,6 +1,6 @@
 #include "Listing.h"
 
-CListing::CListing( POINT pos, POINT size, QObject *parent ) : CNode( parent, pos, size )
+CListing::CListing( POINT pos, POINT size, CNodeMenu* parent ) : CNode( parent, pos, size )
 {
     if (parent == nullptr)
         throw "Parent for CListing can't be null";
@@ -121,7 +121,7 @@ void CListing::SetSize( POINT size )
     CNode::SetSize( size );
 }
 
-bool CListing::AddChield( CNodeMenu* node, QString name )
+bool CListing::AddChield( CNodeMenu* node, const std::string& name )
 {
     return _layout->AddChield( node, name );
 }
@@ -131,12 +131,14 @@ bool CListing::DelChield( CNodeMenu* node )
     return _layout->DelChield( node );
 }
 
-bool CListing::DelChield( QString name )
+bool CListing::DelChield( const std::string& name )
 {
     return _layout->DelChield( name );
 }
 
-CNodeMenu* CListing::GetChield( QString name )
+CNodeMenu* CListing::GetChield( const std::string& name )
 {
     return _layout->GetChield( name );
 }
+
+

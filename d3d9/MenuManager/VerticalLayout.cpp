@@ -1,6 +1,6 @@
 #include "VerticalLayout.h"
 
-CVerticalLayout::CVerticalLayout( QObject *parent, POINT pos ) : CNode( parent, pos )
+CVerticalLayout::CVerticalLayout( CNodeMenu* parent, POINT pos ) : CNode( parent, pos )
 {
     if (parent == nullptr)
         throw "Parent for CVerticalLayout can't be null";
@@ -41,7 +41,7 @@ void CVerticalLayout::SetPosition( POINT pos )
     _pos.x = pos.x;
 }
 
-bool CVerticalLayout::AddChield( CNodeMenu* node, QString name )
+bool CVerticalLayout::AddChield( CNodeMenu* node, const std::string& name )
 {
     if ( name.length() > 1 )
         for ( int i = 0; i < _nodes.size(); ++i )
@@ -70,7 +70,7 @@ bool CVerticalLayout::DelChield( CNodeMenu* node )
     for ( int i = 0; i < _nodes.size(); ++i ){
         if ( _nodes[i].node == node ){
             offset = _nodes[i].node->Height();
-            if ( node->parent() == this ){
+            if ( node->_parent == this ){
                 delete node;
                 ret = true;
             }
@@ -93,9 +93,9 @@ bool CVerticalLayout::DelChield( CNodeMenu* node )
     return ret;
 }
 
-bool CVerticalLayout::DelChield( QString name )
+bool CVerticalLayout::DelChield( const std::string& name )
 {
-    if ( name.isEmpty() )
+    if ( name.empty() )
         return false;
 
     int offset = -1;
@@ -104,7 +104,7 @@ bool CVerticalLayout::DelChield( QString name )
     for ( int i = 0; i < _nodes.size(); ++i ){
         if ( _nodes[i].name == name ){
             offset = _nodes[i].node->Height();
-            if ( _nodes[i].node->parent() == this ){
+            if ( _nodes[i].node->_parent == this ){
                 delete _nodes[i].node;
                 ret = true;
             }
@@ -168,3 +168,5 @@ bool CVerticalLayout::onEvents( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 
     return CNodeMenu::onEvents( hwnd, uMsg, wParam, lParam );
 }
+
+

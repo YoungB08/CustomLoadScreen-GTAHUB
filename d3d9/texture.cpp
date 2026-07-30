@@ -10,7 +10,7 @@ bool safe_release(T &d){
     return false;
 }
 
-SRTexture::SRTexture(int width, int height, QObject *parent) : QObject(parent)
+SRTexture::SRTexture(int width, int height)
 {
     this->pDevice = pDevice;
     textureSize = { width, height };
@@ -40,8 +40,6 @@ void SRTexture::Release()
     safe_release(DS);
     render->Invalidate();
     isReleased = true;
-
-    emit eventReleased();
 }
 
 
@@ -67,22 +65,21 @@ void SRTexture::Initialize(IDirect3DDevice9 *pDevice)
         LoadTexture(path_bkg);
     else if (source_bkg == eTS_mem)
         LoadTexture(addr_bkg, size_bkg);
-
-    emit eventInitialized();
 }
 
-void SRTexture::LoadTexture(QString fileName)
+void SRTexture::LoadTexture(const std::string& fileName)
 {
-    D3DXIMAGE_INFO	imgInfo;
-    D3DXGetImageInfoFromFileW( fileName.toStdWString().c_str(), &imgInfo );
+    std::wstring wFileName(fileName.begin(), fileName.end());
+    D3DXIMAGE_INFO  imgInfo;
+    D3DXGetImageInfoFromFileW( wFileName.c_str(), &imgInfo );
     textureSize_bkg.x = imgInfo.Width;
     textureSize_bkg.y = imgInfo.Height;
-    D3DXCreateTextureFromFileW( pDevice, fileName.toStdWString().c_str(), &pTexture_bkg );
+    D3DXCreateTextureFromFileW( pDevice, wFileName.c_str(), &pTexture_bkg );
 }
 
 void SRTexture::LoadTexture(uint addr, uint size)
 {
-    D3DXIMAGE_INFO	imgInfo;
+    D3DXIMAGE_INFO  imgInfo;
     D3DXGetImageInfoFromFileInMemory( (void*)addr, size, &imgInfo );
     textureSize_bkg.x = imgInfo.Width;
     textureSize_bkg.y = imgInfo.Height;
@@ -99,7 +96,7 @@ bool SRTexture::Draw(IDirect3DTexture9 *texture, int X, int Y, int W, int H, flo
     if (H == -1)
         H = textureSize.y;
 
-    D3DXMATRIX		mat; //Полигоны: https://dl.prime-hack.net/1r4t4.png (как понял)
+    D3DXMATRIX      mat;
     D3DSURFACE_DESC surfDesc;
     texture->GetLevelDesc( 0, &surfDesc );
 
@@ -181,14 +178,15 @@ bool SRTexture::Clear(SRColor color)
     return true;
 }
 
-HRESULT SRTexture::Save(QString fileName)
+HRESULT SRTexture::Save(const std::string& fileName)
 {
     if (isReleased)
         return E_FAIL;
-    return D3DXSaveTextureToFile(fileName.toStdWString().c_str(), D3DXIFF_JPG, pTexture, NULL);
+    std::wstring wFileName(fileName.begin(), fileName.end());
+    return D3DXSaveTextureToFile(wFileName.c_str(), D3DXIFF_JPG, pTexture, NULL);
 }
 
-HRESULT SRTexture::Load(QString fileName)
+HRESULT SRTexture::Load(const std::string& fileName)
 {
     path_bkg = fileName;
     source_bkg = eTS_file;
@@ -226,11 +224,6 @@ bool SRTexture::Render(const int X, const int Y, int W, int H, const float R)
 {
     if (isRenderToTexture)
         return false;
-
-    if (!kIsCalledFirstInitialize){
-        kIsCalledFirstInitialize = true;
-        emit eventInitialized();
-    }
 
     return Draw(pTexture, X, Y, W, H, R);
 }

@@ -3,19 +3,11 @@
 
 #include <windows.h>
 #include "../d3drender.h"
-#include <QObject>
+#include <string>
 #define CALLBACK __stdcall
 
-//template <class T>
-//union bit32{
-//    T v;
-//    byte b[sizeof( T )];
-//};
-
-class CNodeMenu : public QObject
+class CNodeMenu
 {
-    Q_OBJECT
-
     friend class CContextMenu;
     friend class CListing;
     friend class CMenu;
@@ -23,7 +15,7 @@ class CNodeMenu : public QObject
     friend class CVerticalLayout;
     friend class CSlider;
 public:
-    CNodeMenu( QObject *parent, POINT = { 0, 0 }, CD3DFont* = nullptr, bool = false );
+    CNodeMenu( CNodeMenu* parent, POINT = { 0, 0 }, CD3DFont* = nullptr, bool = false );
 
     virtual ~CNodeMenu();
 
@@ -44,18 +36,21 @@ public:
     virtual int Height();
     virtual int Width();
 
-    virtual void SetDescription( QString );
-    virtual QString Description();
+    virtual void SetDescription( const std::string& );
+    virtual std::string Description();
+
+    CNodeMenu* parent() const { return _parent; }
 
 protected:
     CD3DFont *_font;
     CD3DRender *_draw;
     CNodeMenu *_menu;
+    CNodeMenu *_parent;
 
-    QString _description;
+    std::string _description;
     POINT _pos;
-    int _height; // ������ ��������, �������� �� �����������
-    int _width; // ����� ��������, �������� �� �����������
+    int _height;
+    int _width;
     POINT _MP;
     POINT _SO;
     bool _selectable;
@@ -71,11 +66,6 @@ private:
     bool _Init;
     bool _show;
     bool _deleteFont;
-
-signals:
-    void eventShow(CNodeMenu*, bool);
-    void eventMove(CNodeMenu*, POINT);
-    void eventClick(CNodeMenu*, UINT);
 };
 
 #endif // NodeMenu_H

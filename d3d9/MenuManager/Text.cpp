@@ -1,6 +1,6 @@
 #include "Text.h"
 
-CText::CText(QString text, SRColor color, QObject *parent, POINT pos, CD3DFont *font, bool deleteOnDestructor ) : CNodeMenu( parent, pos, font, deleteOnDestructor )
+CText::CText(const std::string& text, SRColor color, CNodeMenu* parent, POINT pos, CD3DFont *font, bool deleteOnDestructor ) : CNodeMenu( parent, pos, font, deleteOnDestructor )
 {
     if (parent == nullptr)
         throw "Parent for CText can't be null";
@@ -40,14 +40,14 @@ void CText::onDraw( int so_V, int so_H )
     CNodeMenu::onDraw( so_V, so_H );
 }
 
-void CText::setText( QString text )
+void CText::setText( const std::string& text )
 {
     _text = text;
     _width = _font->DrawLength( _text );
-    emit eventTextChanged(this, text);
+    
 }
 
-QString CText::text()
+std::string CText::text()
 {
     return _text;
 }
@@ -55,10 +55,12 @@ QString CText::text()
 void CText::setColor( SRColor color )
 {
     _color = color;
-    emit eventColorChanged(this, color);
+    
 }
 
 SRColor CText::color()
 {
     return _color;
 }
+
+

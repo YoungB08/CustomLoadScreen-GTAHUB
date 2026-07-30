@@ -58,8 +58,8 @@ HRESULT CustomLoadScreen::Present(const RECT *pSourceRect, const RECT *pDestRect
     pTexture->Clear(eCdBlack);
 
     // Draw project name
-    pFont->PrintShadow(5, 5, -1, QString(PROJECT_NAME) + " by SR_team");
-    pFont->PrintShadow(5, 20, -1, "Loading: " + QString::number(11.111111 * g_vars.gameSatate) + "%");
+    pFont->PrintShadow(5, 5, -1, std::string(PROJECT_NAME) + " by SR_team");
+    pFont->PrintShadow(5, 20, -1, "Loading: " + std::to_string(11.111111 * g_vars.gameSatate) + "%");
 
     pTexture->End();
     pTexture->Render(0, 0, g_class.params->BackBufferWidth, g_class.params->BackBufferHeight); // Draw texture

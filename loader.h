@@ -22,6 +22,8 @@
 #include "CGame/CVehicle.h"
 // #include "CGame/samp.h"
 
+#include <string>
+
 const HANDLE INVALID_HANDLE = reinterpret_cast<HANDLE>(-1);
 const char PROJECT_NAME[]   = "CustomLoadScreen";
 const char PROJECT_NAME_l[] = "customloadscreen";
@@ -44,9 +46,9 @@ struct stGlobalClasses{
     CDirectX* DirectX;
 };
 struct stGlobalPVars{
-    uint& gameSatate = *reinterpret_cast<uint*>(0xC8D4C0);
+    unsigned int& gameSatate = *reinterpret_cast<unsigned int*>(0xC8D4C0);
     bool& isMenuOpened = *reinterpret_cast<bool*>(0xBA67A4);
-    byte& activeMenuID = *reinterpret_cast<byte*>(0xBA68A5);
+    unsigned char& activeMenuID = *reinterpret_cast<unsigned char*>(0xBA68A5);
     HWND& hwnd = *reinterpret_cast<HWND*>(0xC97C1C);
 };
 
@@ -54,6 +56,6 @@ extern stGlobalHandles g_handle;
 extern stGlobalClasses g_class;
 extern stGlobalPVars g_vars;
 
-int MessageBox(QString text, QString title = QString("CustomLoadScreen"), UINT type = MB_OK);
+int MessageBox(const std::string& text, const std::string& title = "CustomLoadScreen", UINT type = MB_OK);
 
 #endif // LOADER_H

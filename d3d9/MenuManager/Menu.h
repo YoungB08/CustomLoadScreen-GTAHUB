@@ -6,9 +6,8 @@
 
 #include "Node.h"
 #include "ContextMenu.h"
-#include <QRegExp>
-#include <QVector>
-#include <QObject>
+#include <vector>
+#include <string>
 
 template<typename T> void VectorErase( std::vector<T> &vec, T v );
 template<typename T> void myswap( T &a, T &b );
@@ -18,11 +17,10 @@ extern std::vector<CMenu*> MenuList;
 
 class CMenu : public CNodeMenu
 {
-    Q_OBJECT
 
     friend class CNodeMenu;
 public:
-    CMenu( QString, POINT, QObject *parent = 0, CNode* = nullptr );
+    CMenu( const std::string&, POINT, CNodeMenu* parent = nullptr, CNode* = nullptr );
     ~CMenu();
 
     virtual void onDraw( int = 0, int = 0 );
@@ -44,16 +42,16 @@ protected:
     CNode *_node;
     CContextMenu *_context;
 
-    QString _title;
+    std::string _title;
     POINT _size;
     int _header;
 
     bool isMouseOnHeader();
     bool isMouseOnClose();
 
-    virtual void SetMenuHelper( QString );
+    virtual void SetMenuHelper( const std::string& );
 
-    QVector<QString> p_helper;
+    std::vector<std::string> p_helper;
 
 private:
     bool _Init;
