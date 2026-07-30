@@ -70,7 +70,9 @@ void CCallHook::enable(void(__stdcall*func)())
         return;
     }
     m_shortAsm->setWriteOffset(hook_offset);
+    m_shortAsm->sub(ESP, 12);
     m_shortAsm->call(reinterpret_cast<int>(func));
+    m_shortAsm->add(ESP, 12);
     _func = func;
 }
 
@@ -96,7 +98,7 @@ bool CCallHook::checkFlag(T value, T flag )
 void CCallHook::setNops()
 {
     m_shortAsm->setWriteOffset(hook_offset);
-    for (int i = 0; i < static_cast<int>(_size); ++i)
+    for (int i = 0; i < 15; ++i)
         m_shortAsm->nop();
 }
 
