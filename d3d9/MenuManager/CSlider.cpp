@@ -42,7 +42,7 @@ bool CSlider::isInizialize()
 
     _texture = g_class.DirectX->d3d9_CreateTexture( _length, _length / 5.0f );
     _height = _font->DrawHeight();
-    _width = _length + _font->DrawLength(const std::string&::number(_value));
+    _width = _length + _font->DrawLength(std::to_string(_value));
 
     _Init = true;
     return true;
@@ -82,7 +82,7 @@ void CSlider::onDraw( int so_V, int so_H )
 
     _texture->End();
     _texture->Render(posX, posY);
-    _font->PrintShadow(posX + _length, posY, _text, const std::string&::number(_value));
+    _font->PrintShadow(posX + _length, posY, _text, std::to_string(_value));
 
     CNodeMenu::onDraw( so_V, so_H );
 }
@@ -94,12 +94,13 @@ bool CSlider::onEvents(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     } else if (uMsg == WM_LBUTTONUP){
         _moveRoller = false;
     }
+    return CNodeMenu::onEvents(hWnd, uMsg, wParam, lParam);
 }
 
 void CSlider::setValue( float value )
 {
     _value = value;
-    _width = _length + _font->DrawLength(const std::string&::number(_value));
+    _width = _length + _font->DrawLength(std::to_string(_value));
     
 }
 

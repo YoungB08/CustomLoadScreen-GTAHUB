@@ -535,7 +535,7 @@ stColorTag GetColorTag( const char *text, size_t maxLen )
 
 HRESULT CD3DFont::Print( const std::string& text, SRColor color, float x, float y, bool skipColorTags, bool noColorFormat )
 {
-    if ( !m_isReady || text.isEmpty() )
+    if ( !m_isReady || text.empty() )
         return E_FAIL;
 
     float xp = x, yp = y;
@@ -564,19 +564,19 @@ HRESULT CD3DFont::Print( const std::string& text, SRColor color, float x, float 
     size_t len = text.length();
     for ( size_t cpos = 0; cpos < len; cpos++ )
     {
-        if ( text.toStdString()[cpos] == '\n' )
+        if ( text[cpos] == '\n' )
         {
              xp = x;
              yp += DrawHeight();
              continue;
     }
-             int c = ( byte ) ( text.toStdString()[cpos] ) - 32;
+             int c = ( byte ) ( text[cpos] ) - 32;
              if ( !( c >= 0 && c < 224 ) )
              continue;
 
-             if ( text.toStdString()[cpos] == '{' && !noColorFormat )
+             if ( text[cpos] == '{' && !noColorFormat )
         {
-             stColorTag tag = GetColorTag( &text.toStdString().c_str()[cpos], len - cpos );
+             stColorTag tag = GetColorTag( &text.c_str()[cpos], len - cpos );
              if ( tag._valid )
         {
              if ( !skipColorTags )
@@ -626,10 +626,10 @@ HRESULT CD3DFont::Print( const std::string& text, SRColor color, float x, float 
         {
              //if (set.render_text_shadows){
              if (color.red >= 0x80 && color.green >= 0x80 && color.blue >= 0x80)
-             Print(text.toStdString().c_str(), SRColor(eCdBlack, color.alpha), x + 1, y + 1, true, false);
-             else Print(text.toStdString().c_str(), SRColor(eCdWhite, color.alpha), x + 1, y + 1, true, false);
+             Print(text.c_str(), SRColor(eCdBlack, color.alpha), x + 1, y + 1, true, false);
+             else Print(text.c_str(), SRColor(eCdWhite, color.alpha), x + 1, y + 1, true, false);
              //}
-             return Print(text.toStdString().c_str(), color, x, y, false, false);
+             return Print(text.c_str(), color, x, y, false, false);
     }
 
              float CD3DFont::DrawLength ( const std::string& text, bool noColorFormat ) const
@@ -638,15 +638,15 @@ HRESULT CD3DFont::Print( const std::string& text, SRColor color, float x, float 
              float	sub = ( m_dwCreateFlags & FCR_BORDER ) ? 2.0f : 0.0f;
 
              size_t strl = text.length();
-             for ( size_t cpos = 0; cpos < strl && text.toStdString().c_str()[cpos] != '0'; cpos++ )
+             for ( size_t cpos = 0; cpos < strl && text.c_str()[cpos] != '0'; cpos++ )
         {
-             int c = ( byte ) ( text.toStdString().c_str()[cpos] ) - 32;
+             int c = ( byte ) ( text.c_str()[cpos] ) - 32;
              if ( !( c >= 0 && c < 224 ) )
              continue;
 
-             if ( text.toStdString().c_str()[cpos] == '{' && !noColorFormat )
+             if ( text.c_str()[cpos] == '{' && !noColorFormat )
         {
-             stColorTag tag = GetColorTag( &text.toStdString().c_str()[cpos], strl - cpos );
+             stColorTag tag = GetColorTag( &text.c_str()[cpos], strl - cpos );
              if ( tag._valid )
         {
              cpos += tag._alpha ? 9 : 7;
@@ -666,15 +666,15 @@ HRESULT CD3DFont::Print( const std::string& text, SRColor color, float x, float 
              float	sub = ( m_dwCreateFlags & FCR_BORDER ) ? 2.0f : 0.0f;
 
              size_t strl = text.length();
-             for ( size_t cpos = 0; cpos < strl && text.toStdString()[cpos] != '0'; cpos++, pos++ )
+             for ( size_t cpos = 0; cpos < strl && text[cpos] != '0'; cpos++, pos++ )
         {
-             int c = ( byte ) ( text.toStdString()[cpos] ) - 32;
+             int c = ( byte ) ( text[cpos] ) - 32;
              if ( !( c >= 0 && c < 224 ) )
              continue;
 
-             if ( text.toStdString()[cpos] == '{' && !noColorFormat )
+             if ( text[cpos] == '{' && !noColorFormat )
         {
-             stColorTag tag = GetColorTag( &text.toStdString().c_str()[cpos], strl - cpos );
+             stColorTag tag = GetColorTag( &text.c_str()[cpos], strl - cpos );
              if ( tag._valid )
         {
              cpos += tag._alpha ? 9 : 7;
@@ -998,4 +998,5 @@ HRESULT CD3DFont::Print( const std::string& text, SRColor color, float x, float 
 
              return true;
     }
+
 

@@ -5,9 +5,10 @@
 #include <map>
 #include <cstdint>
 #include <vector>
+#include "../types_compat.h"
 #include "sys/mman.h"
 
-typedef unsigned char byte;
+
 
 typedef enum r86{
     EAX = 0,

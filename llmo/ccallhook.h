@@ -39,7 +39,7 @@ protected:
     bool checkFlag(T value, T flag );
 
 private:
-    CShortAsm *_asm;
+    CShortAsm *m_shortAsm;
 
     void setNops();
     void ModOriginalBytes(uint offset);

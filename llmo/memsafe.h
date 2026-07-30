@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <windows.h>
+#include "../types_compat.h"
 
 namespace memsafe
 {

@@ -6,7 +6,7 @@
 #include <wingdi.h>
 #include <d3dx9core.h>
 #include <functional>
-#include "../compat/qt_compat.h"
+#include "../types_compat.h"
 
 class CDirectX //TODO: add call __d3d9_* from proxydirectx.cpp
 {
@@ -177,7 +177,7 @@ protected:
     HRESULT __stdcall	__d3d9_DeletePatch ( UINT Handle );
     HRESULT __stdcall	__d3d9_CreateQuery ( D3DQUERYTYPE Type, IDirect3DQuery9 **ppQuery );
 
-signals:
+public:
     HRESULT QueryInterface ( REFIID riid, void **ppvObj );
     ULONG 	AddRef ( void );
     ULONG 	Release ( void );
@@ -332,3 +332,4 @@ private:
 };
 
 #endif // DIRECTX_H
+

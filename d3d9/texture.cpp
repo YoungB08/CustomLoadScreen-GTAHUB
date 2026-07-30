@@ -183,7 +183,7 @@ HRESULT SRTexture::Save(const std::string& fileName)
     if (isReleased)
         return E_FAIL;
     std::wstring wFileName(fileName.begin(), fileName.end());
-    return D3DXSaveTextureToFile(wFileName.c_str(), D3DXIFF_JPG, pTexture, NULL);
+    return D3DXSaveTextureToFileW(wFileName.c_str(), D3DXIFF_JPG, pTexture, NULL);
 }
 
 HRESULT SRTexture::Load(const std::string& fileName)

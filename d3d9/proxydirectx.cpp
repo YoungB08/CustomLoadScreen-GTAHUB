@@ -1,5 +1,8 @@
 #include "proxydirectx.h"
 #include <vector>
+#include <algorithm>
+
+#include "../types_compat.h"
 
 static IDirect3DDevice9* origIDirect3DDevice9 = static_cast<IDirect3DDevice9*>(nullptr);
 static std::vector<CD3DFont*> fontList;
@@ -15,19 +18,19 @@ proxyIDirect3DDevice9::~proxyIDirect3DDevice9 ( void )
 {
     if (*reinterpret_cast<IDirect3DDevice9 **>(0xC97C28) == this)
         *reinterpret_cast<IDirect3DDevice9 **>(0xC97C28) = origIDirect3DDevice9;
-    foreach (auto pFont, fontList) {
+    for (auto pFont : fontList) {
         if (pFont != nullptr){
             pFont->Invalidate();
             delete pFont;
         }
     }
-    foreach (auto pRender, renderList) {
+    for (auto pRender : renderList) {
         if (pRender != nullptr){
             pRender->Invalidate();
             delete pRender;
         }
     }
-    foreach (auto pTexture, textureList) {
+    for (auto pTexture : textureList) {
         if (pTexture != nullptr){
             pTexture->Release();
             delete pTexture;
@@ -178,20 +181,20 @@ UINT proxyIDirect3DDevice9::GetNumberOfSwapChains ( void )
 HRESULT proxyIDirect3DDevice9::Reset ( D3DPRESENT_PARAMETERS
                                        *pPresentationParameters )
 {
-    foreach (auto pFont, fontList) {
+    for (auto pFont : fontList) {
         if (pFont != nullptr)
             pFont->Invalidate();
-        else fontList.removeOne(pFont);
+        else VectorErase(fontList, pFont);
     }
-    foreach (auto pRender, renderList) {
+    for (auto pRender : renderList) {
         if (pRender != nullptr)
             pRender->Invalidate();
-        else renderList.removeOne(pRender);
+        else VectorErase(renderList, pRender);
     }
-    foreach (auto pTexture, textureList) {
+    for (auto pTexture : textureList) {
         if (pTexture != nullptr)
             pTexture->Release();
-        else textureList.removeOne(pTexture);
+        else VectorErase(textureList, pTexture);
     }
 
     // always attempt to reset orig device if we are asked to
@@ -204,13 +207,13 @@ HRESULT proxyIDirect3DDevice9::Reset ( D3DPRESENT_PARAMETERS
 
     // handle the return from original Reset()
     if ( hRes_orig_Reset == D3D_OK ) {
-        foreach (auto pFont, fontList) {
+        for (auto pFont : fontList) {
             pFont->Initialize(origIDirect3DDevice9);
         }
-        foreach (auto pRender, renderList) {
+        for (auto pRender : renderList) {
             pRender->Initialize(origIDirect3DDevice9);
         }
-        foreach (auto pTexture, textureList) {
+        for (auto pTexture : textureList) {
             pTexture->Initialize(origIDirect3DDevice9);
         }
     }
@@ -1094,7 +1097,7 @@ void proxyIDirect3DDevice9::RegisterFont( CD3DFont *pFont )
 void proxyIDirect3DDevice9::ReleaseFont( CD3DFont *pFont, bool autoDelete )
 {
     pFont->Invalidate();
-    fontList.removeOne(pFont);
+    VectorErase(fontList, pFont);
     if (autoDelete)
         delete pFont;
 }
@@ -1108,7 +1111,7 @@ void proxyIDirect3DDevice9::RegisterRender( CD3DRender *pRender )
 void proxyIDirect3DDevice9::ReleaseRender( CD3DRender *pRender, bool autoDelete )
 {
     pRender->Invalidate();
-    renderList.removeOne(pRender);
+    VectorErase(renderList, pRender);
     if (autoDelete)
         delete pRender;
 }
@@ -1122,7 +1125,7 @@ void proxyIDirect3DDevice9::RegisterTexture(SRTexture *pTexture)
 void proxyIDirect3DDevice9::ReleaseTexture(SRTexture *pTexture, bool autoDelete)
 {
     pTexture->Release();
-    textureList.removeOne(pTexture);
+    VectorErase(textureList, pTexture);
     if (autoDelete)
         delete pTexture;
 }
@@ -1150,3 +1153,4 @@ IDirect3DDevice9 *proxyIDirect3DDevice9::getOriginalDevice()
 {
     return origIDirect3DDevice9;
 }
+

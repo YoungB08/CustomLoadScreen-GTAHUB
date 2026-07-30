@@ -3,9 +3,8 @@
 
 #include <windows.h>
 
-typedef unsigned char uint8_t;
-typedef unsigned short uint16_t;
-typedef unsigned int uint32_t;
+#include <cstdint>
+#include "../types_compat.h"
 typedef class RwV3D CVector;
 typedef class RwV3D VECTOR;
 typedef class RwMatrix CMatrix;

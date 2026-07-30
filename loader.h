@@ -1,6 +1,7 @@
 #ifndef LOADER_H
 #define LOADER_H
 
+#include "types_compat.h"
 #include "llmo/ccallhook.h"
 #include <d3d9.h>
 #include <d3dx9.h>

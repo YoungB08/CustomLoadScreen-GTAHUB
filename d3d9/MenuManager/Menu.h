@@ -6,10 +6,10 @@
 
 #include "Node.h"
 #include "ContextMenu.h"
+#include "../../types_compat.h"
 #include <vector>
 #include <string>
 
-template<typename T> void VectorErase( std::vector<T> &vec, T v );
 template<typename T> void myswap( T &a, T &b );
 
 class CMenu;
@@ -63,16 +63,7 @@ private:
 void SetForeground( CMenu* menu );
 bool IsForeground( CMenu*menu );
 
-template<typename T>
-inline void VectorErase( std::vector<T> &vec, T v )
-{
-    for ( int i = 0; i < vec.size(); ++i ){
-        if ( vec[i] == v ){
-            vec.erase( vec.begin() + i );
-            break;
-        }
-    }
-}
+
 
 template<typename T>
 inline void myswap( T &a, T &b )

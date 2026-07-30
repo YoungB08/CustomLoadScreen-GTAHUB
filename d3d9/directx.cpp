@@ -260,7 +260,7 @@ void CDirectX::__d3d9_SetCursorPosition(int X, int Y, DWORD Flags)
     return SetCursorPosition(X, Y, Flags);
 }
 
-WINBOOL CDirectX::__d3d9_ShowCursor(WINBOOL bShow)
+BOOL CDirectX::__d3d9_ShowCursor(BOOL bShow)
 {
     return ShowCursor(bShow);
 }
@@ -300,7 +300,7 @@ HRESULT CDirectX::__d3d9_GetRasterStatus(UINT iSwapChain, D3DRASTER_STATUS *pRas
     return GetRasterStatus(iSwapChain, pRasterStatus);
 }
 
-HRESULT CDirectX::__d3d9_SetDialogBoxMode(WINBOOL bEnableDialogs)
+HRESULT CDirectX::__d3d9_SetDialogBoxMode(BOOL bEnableDialogs)
 {
     return SetDialogBoxMode(bEnableDialogs);
 }
@@ -340,12 +340,12 @@ HRESULT CDirectX::__d3d9_CreateIndexBuffer(UINT Length, DWORD Usage, D3DFORMAT F
     return CreateIndexBuffer(Length, Usage, Format, Pool, ppIndexBuffer, pSharedHandle);
 }
 
-HRESULT CDirectX::__d3d9_CreateRenderTarget(UINT Width, UINT Height, D3DFORMAT Format, D3DMULTISAMPLE_TYPE MultiSample, DWORD MultisampleQuality, WINBOOL Lockable, IDirect3DSurface9 **ppSurface, HANDLE *pSharedHandle)
+HRESULT CDirectX::__d3d9_CreateRenderTarget(UINT Width, UINT Height, D3DFORMAT Format, D3DMULTISAMPLE_TYPE MultiSample, DWORD MultisampleQuality, BOOL Lockable, IDirect3DSurface9 **ppSurface, HANDLE *pSharedHandle)
 {
     return CreateRenderTarget(Width, Height, Format, MultiSample, MultisampleQuality, Lockable, ppSurface, pSharedHandle);
 }
 
-HRESULT CDirectX::__d3d9_CreateDepthStencilSurface(UINT Width, UINT Height, D3DFORMAT Format, D3DMULTISAMPLE_TYPE MultiSample, DWORD MultisampleQuality, WINBOOL Discard, IDirect3DSurface9 **ppSurface, HANDLE *pSharedHandle)
+HRESULT CDirectX::__d3d9_CreateDepthStencilSurface(UINT Width, UINT Height, D3DFORMAT Format, D3DMULTISAMPLE_TYPE MultiSample, DWORD MultisampleQuality, BOOL Discard, IDirect3DSurface9 **ppSurface, HANDLE *pSharedHandle)
 {
     return CreateDepthStencilSurface(Width, Height, Format, MultiSample, MultisampleQuality, Discard, ppSurface, pSharedHandle);
 }
@@ -465,12 +465,12 @@ HRESULT CDirectX::__d3d9_GetLight(DWORD Index, D3DLIGHT9 *pLight)
     return GetLight(Index, pLight);
 }
 
-HRESULT CDirectX::__d3d9_LightEnable(DWORD Index, WINBOOL Enable)
+HRESULT CDirectX::__d3d9_LightEnable(DWORD Index, BOOL Enable)
 {
     return LightEnable(Index, Enable);
 }
 
-HRESULT CDirectX::__d3d9_GetLightEnable(DWORD Index, WINBOOL *pEnable)
+HRESULT CDirectX::__d3d9_GetLightEnable(DWORD Index, BOOL *pEnable)
 {
     return GetLightEnable(Index, pEnable);
 }
@@ -585,12 +585,12 @@ HRESULT CDirectX::__d3d9_GetScissorRect(RECT *pRect)
     return GetScissorRect(pRect);
 }
 
-HRESULT CDirectX::__d3d9_SetSoftwareVertexProcessing(WINBOOL bSoftware)
+HRESULT CDirectX::__d3d9_SetSoftwareVertexProcessing(BOOL bSoftware)
 {
     return SetSoftwareVertexProcessing(bSoftware);
 }
 
-WINBOOL CDirectX::__d3d9_GetSoftwareVertexProcessing()
+BOOL CDirectX::__d3d9_GetSoftwareVertexProcessing()
 {
     return GetSoftwareVertexProcessing();
 }
@@ -794,3 +794,4 @@ HRESULT CDirectX::__d3d9_CreateQuery(D3DQUERYTYPE Type, IDirect3DQuery9 **ppQuer
 {
     return CreateQuery(Type, ppQuery);
 }
+
