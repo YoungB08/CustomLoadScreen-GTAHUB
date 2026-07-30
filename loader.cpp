@@ -53,7 +53,9 @@ LRESULT APIENTRY WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         if (pCustomLoadScreen && !pCustomLoadScreen->Event(uMsg, wParam, lParam))
             return 0;
     }
-    return CallWindowProc(hOrigProc, hwnd, uMsg, wParam, lParam);
+    if (hOrigProc != NULL)
+        return CallWindowProc(hOrigProc, hwnd, uMsg, wParam, lParam);
+    return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
 void __stdcall GameLoop()
@@ -65,15 +67,17 @@ void __stdcall GameLoop()
     InstallD3DHook();
 
     static bool hooked = false;
-    if (hooked) {
-        if (pCustomLoadScreen)
-            pCustomLoadScreen->Loop();
-        return;
+    if (!hooked && g_vars.hwnd != NULL) {
+        WNDPROC oldProc = reinterpret_cast<WNDPROC>(SetWindowLongA(g_vars.hwnd, GWL_WNDPROC,
+                                                             reinterpret_cast<LONG>(WndProc)));
+        if (oldProc != NULL) {
+            hOrigProc = oldProc;
+            hooked = true;
+        }
     }
-    hooked = true;
 
-    hOrigProc = reinterpret_cast<WNDPROC>(SetWindowLongA(g_vars.hwnd, GWL_WNDPROC,
-                                                         reinterpret_cast<LONG>(WndProc)));
+    if (pCustomLoadScreen)
+        pCustomLoadScreen->Loop();
 }
 
 void __stdcall WindowInitialize() //007455DB
