@@ -1,4 +1,5 @@
 #include "texture.h"
+#include "proxydirectx.h"
 
 template<typename T>
 bool safe_release(T &d){
@@ -12,7 +13,7 @@ bool safe_release(T &d){
 
 SRTexture::SRTexture(int width, int height)
 {
-    this->pDevice = pDevice;
+    this->pDevice = nullptr;
     textureSize = { width, height };
     isReleased = true;
     isRenderToTexture = false;
@@ -47,16 +48,27 @@ void SRTexture::Initialize(IDirect3DDevice9 *pDevice)
 {
     if (pDevice != nullptr)
         this->pDevice = pDevice;
+    if (this->pDevice == nullptr && g_class.DirectX)
+        this->pDevice = g_class.DirectX->d3d9_device();
 
-    if (!isReleased)
+    if (this->pDevice != nullptr)
+    {
+        auto proxy = dynamic_cast<proxyIDirect3DDevice9*>(this->pDevice);
+        if (proxy && proxy->getOriginalDevice() != nullptr)
+            this->pDevice = proxy->getOriginalDevice();
+    }
+
+    if (!isReleased || this->pDevice == nullptr)
         return;
 
     isReleased = false;
     render->Initialize(this->pDevice);
 
-    this->pDevice->CreateTexture(textureSize.x, textureSize.y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &pTexture, NULL);
-    pTexture->GetSurfaceLevel(0, &PP1S);
-    PP1S->Release();
+    if (SUCCEEDED(this->pDevice->CreateTexture(textureSize.x, textureSize.y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &pTexture, NULL)) && pTexture)
+    {
+        pTexture->GetSurfaceLevel(0, &PP1S);
+        if (PP1S) PP1S->Release();
+    }
 
     this->pDevice->CreateDepthStencilSurface(textureSize.x, textureSize.y, D3DFMT_D24X8, D3DMULTISAMPLE_NONE, 0, FALSE, &DS, NULL);
     D3DXCreateSprite(this->pDevice, &pSprite);
@@ -192,7 +204,11 @@ HRESULT SRTexture::Load(const std::string& fileName)
     source_bkg = eTS_file;
 
     if (isReleased)
-        return E_FAIL;
+    {
+        Initialize(pDevice);
+        if (isReleased)
+            return E_FAIL;
+    }
 
     ReInit(textureSize.x, textureSize.y);
     return D3D_OK;

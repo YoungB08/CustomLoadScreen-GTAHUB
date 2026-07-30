@@ -18,6 +18,7 @@ public:
 
     IDirect3DDevice9 *d3d9_device();
     class proxyIDirect3DDevice9 *d3d9_this();
+    void setDevice(IDirect3DDevice9* dx) { _dx = dx; }
     HRESULT d3d9_GenerateShader(IDirect3DPixelShader9 **pShader, float alpha, float red, float green, float blue);
 
     class CD3DFont* d3d9_CreateFont(const char *szFontName, int fontHeight, DWORD dwCreateFlags = 4);

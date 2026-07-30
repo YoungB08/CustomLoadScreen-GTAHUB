@@ -14,10 +14,17 @@ static IDirect3DDevice9* device;
 
 void __stdcall InstallD3DHook()
 {
-    device = new proxyIDirect3DDevice9( *reinterpret_cast<IDirect3DDevice9 **>(0xC97C28));
-    *reinterpret_cast<IDirect3DDevice9 **>(0xC97C28) = dynamic_cast<IDirect3DDevice9*>(device);
-    g_class.d3d = *reinterpret_cast<IDirect3D9**>(0xC97C20);
-    g_class.DirectX = new CDirectX(device);
+    IDirect3DDevice9* realDev = *reinterpret_cast<IDirect3DDevice9 **>(0xC97C28);
+    if (realDev != nullptr && realDev != dynamic_cast<IDirect3DDevice9*>(device))
+    {
+        device = new proxyIDirect3DDevice9(realDev);
+        *reinterpret_cast<IDirect3DDevice9 **>(0xC97C28) = dynamic_cast<IDirect3DDevice9*>(device);
+        g_class.d3d = *reinterpret_cast<IDirect3D9**>(0xC97C20);
+        if (!g_class.DirectX)
+            g_class.DirectX = new CDirectX(device);
+        else
+            g_class.DirectX->setDevice(device);
+    }
 }
 
 LRESULT APIENTRY WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -29,7 +36,7 @@ LRESULT APIENTRY WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                 if ( !MenuList[static_cast<size_t>(i)]->onEvents( hwnd, uMsg, wParam, lParam ) )
                     break;
 
-        if (!pCustomLoadScreen->Event(uMsg, wParam, lParam))
+        if (pCustomLoadScreen && !pCustomLoadScreen->Event(uMsg, wParam, lParam))
             return 0;
     }
     return CallWindowProc(hOrigProc, hwnd, uMsg, wParam, lParam);
@@ -37,25 +44,20 @@ LRESULT APIENTRY WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 void __stdcall GameLoop()
 {
-    // g_handle.samp = GetModuleHandleA("samp.dll");
-    // if (g_handle.samp == nullptr || g_handle.samp == INVALID_HANDLE)
-    // 	return;
-
     g_handle.d3d9 = GetModuleHandleA("d3d9.dll");
     if (g_handle.d3d9 == nullptr || g_handle.d3d9 == INVALID_HANDLE)
         return;
 
-    // g_class.samp = *reinterpret_cast<stSAMP**>(g_handle.dwSAMP + SAMP_INFO_OFFSET);
-    // if (g_class.samp == nullptr)
-    // 	return;
+    InstallD3DHook();
 
     static bool hooked = false;
-    if (hooked)
-        return pCustomLoadScreen->Loop();
+    if (hooked) {
+        if (pCustomLoadScreen)
+            pCustomLoadScreen->Loop();
+        return;
+    }
     hooked = true;
 
-//    InstallD3DHook();
-//    pCustomLoadScreen = new CustomLoadScreen();
     hOrigProc = reinterpret_cast<WNDPROC>(SetWindowLongA(g_vars.hwnd, GWL_WNDPROC,
                                                          reinterpret_cast<LONG>(WndProc)));
 }
@@ -63,9 +65,9 @@ void __stdcall GameLoop()
 void __stdcall WindowInitialize() //007455DB
 {
     g_handle.d3d9 = GetModuleHandleA("d3d9.dll");
-//    GameLoop();
+    if (!pCustomLoadScreen)
+        pCustomLoadScreen = new CustomLoadScreen();
     InstallD3DHook();
-    pCustomLoadScreen = new CustomLoadScreen();
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReasonForCall, LPVOID)
