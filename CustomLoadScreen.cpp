@@ -157,18 +157,8 @@ static void InitCEF()
 
         if (fn_cef_create_browser)
         {
-            Log("[CEF] Found CEF API in module %p. Loading embedded HTML data URI...", hCEF);
-            std::string dataUrl = "data:text/html;charset=utf-8,";
-            for (char c : std::string(GTAHUB_EMBEDDED_HTML)) {
-                if (isalnum((unsigned char)c) || c == '-' || c == '_' || c == '.' || c == '~') {
-                    dataUrl += c;
-                } else {
-                    char buf[4];
-                    sprintf(buf, "%%%02X", (unsigned char)c);
-                    dataUrl += buf;
-                }
-            }
-            fn_cef_create_browser(BROWSER_ID, dataUrl.c_str(), false, false);
+            Log("[CEF] Found CEF API in module %p. Loading UI.html...", hCEF);
+            fn_cef_create_browser(BROWSER_ID, "UI.html", true, false);
             cefActive = true;
         }
     }
@@ -261,16 +251,41 @@ HRESULT CustomLoadScreen::Present(const RECT *pSourceRect, const RECT *pDestRect
     if (!init || !pTexture || !pFont)
         return D3D_OK;
 
-    // Render
+    // Render Background Image
     pTexture->Begin();
     pTexture->Clear(eCdBlack);
-
-    // Draw stylized text with HTML Hex color tags
-    pFont->PrintShadow(20, 20, -1, "{FF3333}GTAHUB {FFFFFF}| Roleplay Server");
-    pFont->PrintShadow(20, 42, -1, "{AAAAAA}Status: {FFFFFF}Loading game assets... {FFD700}" + std::to_string(percentage) + "%");
-
     pTexture->End();
-    pTexture->Render(0, 0, screenWidth, screenHeight); // Draw texture
+    pTexture->Render(0, 0, screenWidth, screenHeight);
+
+    // Render Direct3D 9 Progress Bar UI
+    if (pFont && pFont->m_pRender)
+    {
+        float barW = 500.0f;
+        float barH = 22.0f;
+        float barX = (float)(screenWidth - barW) / 2.0f;
+        float barY = (float)screenHeight - 80.0f;
+
+        SRColor borderCol = { 255, 255, 51, 51 };  // Glowing red border
+        SRColor bgCol = { 220, 15, 15, 20 };       // Dark semi-transparent box
+        SRColor fillCol = { 255, 255, 140, 0 };    // Vibrant Orange/Gold fill
+
+        // Outer Border + Dark Background Box
+        pFont->m_pRender->D3DBoxBorder(barX, barY, barW, barH, borderCol, bgCol);
+
+        // Filled Progress Bar
+        if (percentage > 0) {
+            float fillW = (barW - 4.0f) * ((float)percentage / 100.0f);
+            if (fillW > 0.0f) {
+                pFont->m_pRender->D3DBox(barX + 2.0f, barY + 2.0f, fillW, barH - 4.0f, fillCol);
+            }
+        }
+
+        // Title and Percentage Text
+        pFont->PrintShadow(barX, barY - 26.0f, -1, "{FF3333}GTAHUB {FFFFFF}| Roleplay Server");
+        std::string pctText = std::to_string(percentage) + "%";
+        float textW = pFont->DrawLength(pctText);
+        pFont->PrintShadow(barX + barW - textW, barY - 26.0f, -1, "{FFD700}" + pctText);
+    }
 
     return D3D_OK;
 }
