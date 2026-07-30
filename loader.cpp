@@ -79,40 +79,26 @@ LRESULT APIENTRY WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
-void __stdcall GameLoop()
+DWORD WINAPI D3DHookThread(LPVOID)
 {
-    g_handle.d3d9 = GetModuleHandleA("d3d9.dll");
-    if (g_handle.d3d9 == nullptr || g_handle.d3d9 == INVALID_HANDLE)
-        return;
-
-    InstallD3DHook();
-
-    static bool hooked = false;
-    if (!hooked && g_vars.hwnd != NULL) {
-        WNDPROC oldProc = reinterpret_cast<WNDPROC>(SetWindowLongA(g_vars.hwnd, GWL_WNDPROC,
-                                                             reinterpret_cast<LONG>(WndProc)));
-        if (oldProc != NULL) {
-            hOrigProc = oldProc;
-            hooked = true;
+    Log("[THREAD] D3D Hook thread started, polling 0xC97C28...");
+    for (int i = 0; i < 500; ++i)
+    {
+        IDirect3DDevice9* realDev = *reinterpret_cast<IDirect3DDevice9 **>(0xC97C28);
+        if (realDev != nullptr && realDev != static_cast<IDirect3DDevice9*>(device))
+        {
+            Log("[THREAD] Found valid D3D9 device at 0xC97C28: %p", realDev);
+            InstallD3DHook();
+            Log("[THREAD] D3D9 Hook installed successfully!");
+            break;
         }
+        Sleep(20);
     }
-
-    if (pCustomLoadScreen)
-        pCustomLoadScreen->Loop();
-}
-
-void __stdcall WindowInitialize() //007455DB
-{
-    g_handle.d3d9 = GetModuleHandleA("d3d9.dll");
-    if (!pCustomLoadScreen)
-        pCustomLoadScreen = new CustomLoadScreen();
-    InstallD3DHook();
+    return 0;
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReasonForCall, LPVOID)
 {
-    static CCallHook *gameloopHook = nullptr;
-
     if (dwReasonForCall == DLL_PROCESS_ATTACH){
         Log("[INIT] CustomLoadScreen.asi attached to process");
 
@@ -127,17 +113,13 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReasonForCall, LPVOID)
             return FALSE;
         }
 
-        Log("[INIT] Installing GameLoop hook at 0x00748DA3");
-        gameloopHook = new CCallHook(reinterpret_cast<void*>(0x00748DA3),
-                                     eSafeCall(sc_registers | sc_flags), 5);
-        gameloopHook->enable(GameLoop);
-        Log("[INIT] GameLoop hook enabled successfully");
+        Log("[INIT] Creating D3D9 hook thread");
+        CreateThread(NULL, 0, D3DHookThread, NULL, 0, NULL);
     }
     else if (dwReasonForCall == DLL_PROCESS_DETACH){
         Log("[EXIT] Detaching CustomLoadScreen.asi");
-        delete gameloopHook;
-        gameloopHook = nullptr;
-        SetWindowLongA(g_vars.hwnd, GWL_WNDPROC, reinterpret_cast<LONG>(hOrigProc));
+        if (hOrigProc != NULL && g_vars.hwnd != NULL)
+            SetWindowLongA(g_vars.hwnd, GWL_WNDPROC, reinterpret_cast<LONG>(hOrigProc));
         delete pCustomLoadScreen;
         pCustomLoadScreen = nullptr;
         delete device;
